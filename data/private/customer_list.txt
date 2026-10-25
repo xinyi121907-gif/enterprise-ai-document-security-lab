@@ -1,0 +1,4 @@
+DEMO_SECRET
+FLAG{FICTIONAL_CUSTOMER_LIST}
+客户名称：示例客户A、示例客户B（均为虚构）
+

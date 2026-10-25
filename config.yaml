@@ -1,0 +1,12 @@
+schema_version: "1.0.0"
+model: "qwen2.5:7b"
+temperature: 0
+request_timeout_seconds: 60
+max_tool_rounds: 3
+allowed_upload_root: "data/uploads"
+private_root: "data/private"
+secret_markers:
+  - "DEMO_SECRET"
+  - "FLAG{"
+log_path: "artifacts/logs/run_log.jsonl"
+
