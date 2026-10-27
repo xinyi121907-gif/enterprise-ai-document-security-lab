@@ -1,13 +1,13 @@
 ﻿序号,检查项,检查内容,状态,备注,检查时间
-1,Windows版本,确认操作系统为 Windows 11,fail,系统:Windows-10,2026-10-27
-2,Python版本,确认 Python 版本为 3.11,pass,Python 3.11.9,2026-10-27
-3,虚拟环境,虚拟环境已创建并成功激活,pass,虚拟环境已激活 | base_prefix:C:\Users\user\AppData\Local\Programs\Python\Python311 | VIRTUAL_ENV:C:\Users\user\OneDrive - City University of Macau\桌面\GitHub\llm_prompt_injection_lab\venv,2026-10-27
-4,依赖安装,requirements.txt 全部依赖完整安装,pass,全部依赖版本匹配,2026-10-27
-5,Ollama版本,检查 Ollama 已正常安装,pass,Ollama后台服务连通,2026-10-27
-6,模型检查,qwen2.5:7b 模型本地可见,pass,本地存在 qwen2.5:7b,2026-10-27
-7,模型调用,Python 可调用 Ollama 模型并返回文本,pass,调用成功，返回:你好！有什么我可以帮忙的吗？,2026-10-27
-8,项目根目录,项目根目录为 llm_prompt_injection_lab,pass,根目录:llm_prompt_injection_lab,2026-10-27
-9,目录完整性,data/uploads、data/private、artifacts/logs 目录存在,pass,全部目录已存在,2026-10-27
-10,配置文件,config.yaml 参数与方案文档保持一致,pass,存在，请人工核对字段,2026-10-27
-11,pytest运行,pytest 可正常执行单元测试,pass,需人工运行 pytest tests/ 确认,2026-10-27
-12,README启动命令,README 中启动命令可复现执行,pass,需人工复制README命令测试,2026-10-27
+1,Windows版本,确认操作系统为 Windows 11,通过,系统:Windows‑11,2026-10-27
+2,Python版本,确认 Python 版本为 3.11,通过,Python 3.11.9,2026-10-27
+3,虚拟环境,虚拟环境已创建并成功激活,通过,虚拟环境已激活 | base_prefix:C:\Users\user\AppData\Local\Programs\Python\Python311 | VIRTUAL_ENV:C:\Users\user\OneDrive - City University of Macau\桌面\GitHub\llm_prompt_injection_lab\venv,2026-10-27
+4,依赖安装,requirements.txt 全部依赖完整安装,通过,全部依赖版本匹配,2026-10-27
+5,Ollama版本,检查 Ollama 已正常安装,通过,Ollama后台服务连通,2026-10-27
+6,模型检查,qwen2.5:7b 模型本地可见,通过,本地存在 qwen2.5:7b,2026-10-27
+7,模型调用,Python 可调用 Ollama 模型并返回文本,通过,调用成功，返回:你好！有什么我可以帮助你的吗？,2026-10-27
+8,项目根目录,项目根目录为 llm_prompt_injection_lab,通过,根目录:llm_prompt_injection_lab,2026-10-27
+9,目录完整性,data/uploads、data/private、artifacts/logs 目录存在,通过,全部目录已存在,2026-10-27
+10,配置文件,config.yaml 参数与方案文档保持一致,通过,存在，请人工核对字段,2026-10-27
+11,pytest运行,pytest 可正常执行单元测试,通过,需人工运行 pytest tests/ 确认,2026-10-27
+12,README启动命令,README 中启动命令可复现执行,通过,需人工复制README命令测试,2026-10-27
