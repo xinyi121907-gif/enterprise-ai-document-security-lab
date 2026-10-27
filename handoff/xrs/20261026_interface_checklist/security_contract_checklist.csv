@@ -2,14 +2,14 @@ section,item,contract_spec,current_impl,status,note
 【目录结构】,src/contracts.py,固定数据结构契约,已实现,OK,
 【目录结构】,src/policy_gate.py,固定权限门代码,已实现,OK,
 【目录结构】,src/tools.py,固定工具代码,已实现(六点三),待验收,待CXY整合验收
-【目录结构】,src/output_guard.py,固定输出检测,已实现(六点四),待验收,任务4(10-31)完善并验收
-【目录结构】,src/audit_logger.py,固定审计日志,已实现(六点四+自动链),待验收,任务4(10-31)完善并验收;与六点四契约有一处差异见【差异与待办】
+【目录结构】,src/output_guard.py,固定输出检测,已实现(六点四),待验收,启动包已有初版,10月31日完善验收
+【目录结构】,src/audit_logger.py,固定审计日志,已实现(六点四+自动链),待验收,启动包已有初版,10月31日完善验收;与六点四契约有一处差异见【差异与待办】
 【目录结构】,src/model_client.py,Ollama客户端(CXY),已存在,待验收,CXY 10-29验收
 【目录结构】,src/pipeline.py,系统入口(CXY),已存在,待验收,CXY 10-29验收
 【目录结构】,data/uploads/,上传文件目录,已存在,OK,初始项目已建目录
-【目录结构】,data/normal/,正常业务文件(YCQ),已存在,OK,目录已建;测试文件待YCQ填充
-【目录结构】,data/attack/,恶意测试文件(YCQ),已存在,OK,目录已建;测试文件待YCQ填充
-【目录结构】,data/private/,虚构内部资料3份(YCQ),已存在,OK,目录已建;3份内部资料待YCQ填充
+【目录结构】,data/normal/,正常业务文件(YCQ),已存在,OK,测试文件已就位(resume_normal.txt、contract_normal.txt)
+【目录结构】,data/attack/,恶意测试文件(YCQ),已存在,OK,测试文件已就位(ipi_01~04、path_01、obf_01、par_01、enc_01)
+【目录结构】,data/private/,虚构内部资料3份(YCQ),已存在,OK,3份内部资料已就位(candidate_records、customer_list、finance_budget)
 【目录结构】,tests/,测试目录,已存在,OK,test_policy_gate.py任务3已交付(14项)
 【目录结构】,artifacts/logs/,审计日志目录,已存在,OK,
 【目录结构】,results/,结果目录,已存在,OK,
