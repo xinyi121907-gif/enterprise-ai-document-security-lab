@@ -1,0 +1,10 @@
+Python 3.11.2
+ollama version is 0.40.8
+NAME          ID              SIZE      MODIFIED       
+qwen2.5:7b    845dbda0ea48    4.7 GB    20 minutes ago    
+正在通过 Python 调用 Ollama，请稍候……
+模型名称： qwen2.5:7b
+模型回复： PYTHON调用成功
+PYTHON_OLLAMA_TEST=PASS
+......                                                                   [100%]
+6 passed in 0.17s
