@@ -1,16 +1,16 @@
 section,item,contract_spec,current_impl,status,note
-【目录结构】,src/contracts.py,固定数据结构契约,已存在,OK,
-【目录结构】,src/policy_gate.py,固定权限门代码,已存在,OK,
-【目录结构】,src/tools.py,固定工具代码,已存在(占位),OK,待CXY/本人按六点三完善
-【目录结构】,src/output_guard.py,固定输出检测,已存在(占位),OK,任务4(10-31)完善
-【目录结构】,src/audit_logger.py,固定审计日志,已存在(占位),OK,任务4(10-31)完善
-【目录结构】,src/model_client.py,Ollama客户端(CXY),已存在(占位),待建,CXY 10-29
-【目录结构】,src/pipeline.py,系统入口(CXY),已存在(占位),待建,CXY 10-29
-【目录结构】,data/uploads/,上传文件目录,待建,待建,CXY或YCQ创建
-【目录结构】,data/normal/,正常业务文件(YCQ),待建,待建,YCQ 10-29
-【目录结构】,data/attack/,恶意测试文件(YCQ),待建,待建,YCQ 10-29
-【目录结构】,data/private/,虚构内部资料3份(YCQ),待建,待建,YCQ 10-29
-【目录结构】,tests/,测试目录,已存在,OK,test_policy_gate.py任务3
+【目录结构】,src/contracts.py,固定数据结构契约,已实现,OK,
+【目录结构】,src/policy_gate.py,固定权限门代码,已实现,OK,
+【目录结构】,src/tools.py,固定工具代码,已实现(六点三),待验收,待CXY整合验收
+【目录结构】,src/output_guard.py,固定输出检测,已实现(六点四),待验收,任务4(10-31)完善并验收
+【目录结构】,src/audit_logger.py,固定审计日志,已实现(六点四+自动链),待验收,任务4(10-31)完善并验收;与六点四契约有一处差异见【差异与待办】
+【目录结构】,src/model_client.py,Ollama客户端(CXY),已存在,待验收,CXY 10-29验收
+【目录结构】,src/pipeline.py,系统入口(CXY),已存在,待验收,CXY 10-29验收
+【目录结构】,data/uploads/,上传文件目录,已存在,OK,初始项目已建目录
+【目录结构】,data/normal/,正常业务文件(YCQ),已存在,OK,目录已建;测试文件待YCQ填充
+【目录结构】,data/attack/,恶意测试文件(YCQ),已存在,OK,目录已建;测试文件待YCQ填充
+【目录结构】,data/private/,虚构内部资料3份(YCQ),已存在,OK,目录已建;3份内部资料待YCQ填充
+【目录结构】,tests/,测试目录,已存在,OK,test_policy_gate.py任务3已交付(14项)
 【目录结构】,artifacts/logs/,审计日志目录,已存在,OK,
 【目录结构】,results/,结果目录,已存在,OK,
 【目录结构】,docs/,文档目录,已存在,OK,
@@ -40,13 +40,14 @@ section,item,contract_spec,current_impl,status,note
 【理由码】,PATH_OUTSIDE_UPLOAD_ROOT,UPLOAD_ROOT 不在 target.parents → DENY,已实现,OK,优先级4:越过上传根目录
 【理由码】,CURRENT_UPLOAD_ONLY,全部通过 → ALLOW,已实现,OK,放行唯一路径
 【函数契约】,authorize_tool(req,current_upload)->PolicyResult,先规范化路径再判任务/工具/文件/根,已实现,OK,与六点二逐行一致
-【函数契约】,execute_tool_protected(req,current_upload),先authorize再执行,待实现,待建,任务2(10-27)
-【函数契约】,execute_tool_vulnerable(tool_name,target_path),故意不做权限判断(仅实验),待实现,待建,任务2(10-27)
-【函数契约】,scan_output(text),SECRET_MARKERS=("DEMO_SECRET","FLAG{"),待实现,待建,任务4(10-31)
-【函数契约】,calculate_record_hash(record,previous_hash),sha256(record+previous_hash),待实现,待建,任务4(10-31)
-【函数契约】,write_log(record,previous_hash="GENESIS"),JSONL追加+record_hash,待实现,待建,任务4(10-31)
-【函数契约】,verify_log_chain(records),前哈希链校验,待实现,待建,任务4(10-31)
+【函数契约】,execute_tool_protected(req,current_upload),先authorize再执行,已实现,待验收,任务2(10-27)交付
+【函数契约】,execute_tool_vulnerable(tool_name,target_path),故意不做权限判断(仅实验),已实现,待验收,任务2(10-27)交付
+【函数契约】,scan_output(text),SECRET_MARKERS=("DEMO_SECRET","FLAG{"),已实现,待验收,任务4(10-31)交付
+【函数契约】,calculate_record_hash(record,previous_hash),sha256(record+previous_hash),已实现,待验收,任务4(10-31)交付
+【函数契约】,write_log(record,previous_hash),JSONL追加+record_hash,已实现,待验收,任务4(10-31)交付
+【函数契约】,verify_log_chain(records),前哈希链校验,已实现,待验收,任务4(10-31)交付
 【差异与待办】,Field导入,分工文档六点一 import Field但未使用,当前未导入,差异,建议保持不导入,无副作用
+【差异与待办】,audit_logger链式哈希,六点四契约固定previous_hash="GENESIS";当前实现改为_last_hash自动链式,当前为自动链,差异,自动链兼容verify_log_chain且防插入;建议任务4与CXY确认后固化
 【差异与待办】,理由码顺序,固定判定顺序不可调换,已按顺序实现,OK,优先级影响测试结果,冻结
 【差异与待办】,UPLOAD_ROOT,data/uploads的resolve路径,已实现,OK,与config.allowed_upload_root一致
 【冻结声明】,接口版本,v1.0,全部确认,OK,除新增功能外不修改;确需修改走CXY更新+XRS同步测试流程
