@@ -1,7 +1,16 @@
-item,check_content,status,remark,check_time
-主机连通性,测试服务器ping可达,pass,延迟正常,2026-10-26 21:20
-端口开放,检查22、80端口,pass,端口按规划开放,2026-10-26 21:21
-防火墙策略,核对出入站规则,fail,多余放行策略未清理,2026-10-26 21:22
-账号权限,核查弱密码账号,pass,无弱口令,2026-10-26 21:23
-日志审计,确认日志采集开启,skip,该节点暂未部署采集器,2026-10-26 21:24
+# 本地 Ollama 文档助手环境检查表
 
+| 序号 | 检查项 | 检查内容 | 状态 | 备注 | 检查时间 |
+|---|---|---|---|---|---|
+| 1 | Windows版本 | 确认操作系统为 Windows 11 | pass/fail | 核对系统关于页面 | 2026-10-27 |
+| 2 | Python版本 | 确认 Python 版本为 3.11 | pass/fail | 执行 `python --version` | 2026-10-27 |
+| 3 | 虚拟环境 | 虚拟环境已创建并成功激活 | pass/fail | 查看终端环境标识 | 2026-10-27 |
+| 4 | 依赖安装 | requirements.txt 全部依赖完整安装 | pass/fail | 执行 `pip list` 核对版本 | 2026-10-27 |
+| 5 | Ollama版本 | 检查 Ollama 已正常安装 | pass/fail | 执行 `ollama --version` | 2026-10-27 |
+| 6 | 模型检查 | qwen2.5:7b 模型本地可见 | pass/fail | 执行 `ollama list` | 2026-10-27 |
+| 7 | 模型调用 | Python 可调用 Ollama 模型并返回文本 | pass/fail | 执行最小测试调用脚本 | 2026-10-27 |
+| 8 | 项目根目录 | 项目根目录为 `llm_prompt_injection_lab` | pass/fail | 核对当前工作路径 | 2026-10-27 |
+| 9 | 目录完整性 | `data/uploads`、`data/private`、`artifacts/logs` 目录存在 | pass/fail | 文件浏览器查看目录结构 | 2026-10-27 |
+| 10 | 配置文件 | `config.yaml` 参数与方案文档保持一致 | pass/fail | 核对 model、temperature、secret_markers 等字段 | 2026-10-27 |
+| 11 | pytest运行 | pytest 可正常执行单元测试 | pass/fail | 执行 `pytest tests/` | 2026-10-27 |
+| 12 | README启动命令 | README 中启动命令可复现执行 | pass/fail | 复制命令在终端尝试运行 | 2026-10-27 |
