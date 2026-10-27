@@ -1,13 +1,15 @@
 序号,检查项,检查内容,状态,备注,检查时间
-1,Windows版本,确认操作系统为 Windows 11,pass/fail,核对系统关于页面,2026-10-27
-2,Python版本,确认 Python 版本为 3.11,pass/fail,执行 python --version,2026-10-27
-3,虚拟环境,虚拟环境已创建并成功激活,pass/fail,查看终端环境标识,2026-10-27
-4,依赖安装,requirements.txt 全部依赖完整安装,pass/fail,执行 pip list 核对版本,2026-10-27
-5,Ollama版本,检查 Ollama 已正常安装,pass/fail,执行 ollama --version,2026-10-27
-6,模型检查,qwen2.5:7b 模型本地可见,pass/fail,执行 ollama list,2026-10-27
-7,模型调用,Python 可调用 Ollama 模型并返回文本,pass/fail,执行最小测试调用脚本,2026-10-27
-8,项目根目录,项目根目录为 llm_prompt_injection_lab,pass/fail,核对当前工作路径,2026-10-27
-9,目录完整性,data/uploads、data/private、artifacts/logs 目录存在,pass/fail,文件浏览器查看目录结构,2026-10-27
-10,配置文件,config.yaml 参数与方案文档保持一致,pass/fail,核对 model、temperature、secret_markers 等字段,2026-10-27
-11,pytest运行,pytest 可正常执行单元测试,pass/fail,"执行 pytest tests/",2026-10-27
-12,README启动命令,README 中启动命令可复现执行,pass/fail,复制命令在终端尝试运行,2026-10-27
+1,Windows版本,确认操作系统为 Windows 11,pass/fail,核对系统关于页面,xxxx_xx_xx
+2,Python版本,确认 Python 版本为 3.11,pass/fail,执行 python --version,xxxx_xx_xx
+3,虚拟环境,虚拟环境已创建并成功激活,pass/fail,查看终端环境标识,xxxx_xx_xx
+4,依赖安装,requirements.txt 全部依赖完整安装,pass/fail,执行 pip list 核对版本,xxxx_xx_xx
+5,Ollama版本,检查 Ollama 已正常安装,pass/fail,执行 ollama --version,xxxx_xx_xx
+6,模型检查,qwen2.5:7b 模型本地可见,pass/fail,执行 ollama list,xxxx_xx_xx
+7,模型调用,Python 可调用 Ollama 模型并返回文本,pass/fail,执行最小测试调用脚本,xxxx_xx_xx
+8,项目根目录,项目根目录为 enterprise-ai-document-security-lab,pass/fail,核对当前工作路径,xxxx_xx_xx
+9,目录完整性,data/uploads、data/private、artifacts/logs 目录存在,pass/fail,文件浏览器查看目录结构,xxxx_xx_xx
+10,配置文件,config.yaml 参数与方案文档保持一致,pass/fail,核对 model、temperature、secret_markers 等字段,xxxx_xx_xx
+11,pytest运行,pytest 可正常执行单元测试,pass/fail,"执行 pytest tests/",xxxx_xx_xx
+12,README启动命令,README 中启动命令可复现执行,pass/fail,复制命令在终端尝试运行,xxxx_xx_xx
+13,独立复现环境,环境干净、无残留全局包干扰,pass/fail,全新虚拟环境从头复现验证,xxxx_xx_xx
+14,证据目录,测试截图、日志、输出产物统一存放在evidence目录,pass/fail,检查evidence目录及归档文件,xxxx_xx_xx
