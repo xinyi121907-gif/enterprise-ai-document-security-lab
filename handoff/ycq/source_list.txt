@@ -1,4 +1,0 @@
-来源类型,标题,链接/出处,对应映射内容
-OWASP,OWASP Top 10 for LLM Applications 2025,https://owasp.org/www-project-top-10-for-large-language-model-applications/,LLM01/LLM06/LLM08风险条目
-课程,《资讯安全》访问控制章节,课程PPT第X讲,最小权限/信任边界知识点
-课程,《资讯安全》提示注入案例,课堂讲义第X页,直接/间接注入定义
