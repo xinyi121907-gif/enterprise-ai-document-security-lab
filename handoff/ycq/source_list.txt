@@ -1,0 +1,6 @@
+来源类型,标题,链接或出处,对应内容
+OWASP,OWASP Top 10 for LLM Applications 2025,https://owasp.org/www-project-top-10-for-large-language-model-applications/,LLM01提示注入、LLM02敏感信息泄露、LLM06过度代理
+课程,《资讯安全》第4章访问控制,5_Ch4_Access2_SZ(2).pptx第44页和第48页,基于角色的访问控制与最小权限原则
+课程,《资讯安全》第4章访问控制,5_Ch4_Access2_SZ(2).pptx第6页和第52页,授权概念与执行前权限判断
+课程,《资讯安全》第4章访问控制,5_Ch4_Access2_SZ(2).pptx第59页至第65页,安全审计、日志记录与审计系统
+项目设计,企业文档安全审查项目内部设计,项目方案与代码实现,不可信文档隔离、工具白名单与当前文件限制

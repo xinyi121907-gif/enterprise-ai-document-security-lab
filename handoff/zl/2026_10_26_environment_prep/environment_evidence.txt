@@ -1,0 +1,42 @@
+【1】Windows版本
+Windows‑11
+
+【2】python --version
+Python 3.11.9
+
+【3】虚拟环境信息
+虚拟环境已激活 | base_prefix:C:\Users\user\AppData\Local\Programs\Python\Python311 | VIRTUAL_ENV:C:\Users\user\OneDrive - City University of Macau\桌面\GitHub\llm_prompt_injection_lab\venv
+
+【4】python -m pip check
+No broken requirements found.
+
+【5】ollama list
+NAME          ID              SIZE      MODIFIED    
+qwen2.5:7b    845dbda0ea48    4.7 GB    5 hours ago
+
+【6】模型列表校验
+本地存在 qwen2.5:7b
+
+【7】模型调用 qwen2.5:7b
+返回内容：你好！很高兴为你服务。有什么问题或者需要帮助的吗？
+
+【8】项目根目录校验
+根目录:enterprise-ai-document-security-lab
+
+【9】目录完整性校验
+全部目录已存在
+
+【10】复现环境文件校验
+存在README、requirements.txt，支持复现
+
+【11】evidence目录校验
+evidence目录已建立
+
+【12】config.yaml配置文件校验
+===== 人工核对，核对完成粘贴结果于此 =====
+
+【13】python -m pytest -q
+===== 手动执行 pytest tests/ 后把输出粘贴到此 =====
+
+【14】README启动命令验证
+===== 手动执行README启动命令，粘贴运行结果于此 =====
