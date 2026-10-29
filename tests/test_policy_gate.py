@@ -8,7 +8,6 @@ monkeypatches UPLOAD_ROOT, so tests never touch the real data/ directory.
 """
 
 import os
-from pathlib import Path
 
 import pytest
 
@@ -16,7 +15,12 @@ from src.contracts import ToolRequest
 from src.policy_gate import authorize_tool
 
 
-def _req(case_id, tool_name, target, task="REVIEW_DOCUMENT"):
+def _req(
+    case_id,
+    tool_name,
+    target,
+    task="REVIEW_DOCUMENT",
+):
     return ToolRequest(
         case_id=case_id,
         task=task,
@@ -28,21 +32,39 @@ def _req(case_id, tool_name, target, task="REVIEW_DOCUMENT"):
 @pytest.fixture
 def env(tmp_path, monkeypatch):
     up = tmp_path / "data" / "uploads"
-    up.mkdir(parents=True, exist_ok=True)
+    up.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     private = tmp_path / "data" / "private"
-    private.mkdir(parents=True, exist_ok=True)
+    private.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     doc = up / "resume.txt"
-    doc.write_text("resume-demo", encoding="utf-8")
+    doc.write_text(
+        "resume-demo",
+        encoding="utf-8",
+    )
 
     other = up / "other.txt"
-    other.write_text("other-demo", encoding="utf-8")
+    other.write_text(
+        "other-demo",
+        encoding="utf-8",
+    )
 
     secret = private / "secret.txt"
-    secret.write_text("TOP-SECRET", encoding="utf-8")
+    secret.write_text(
+        "TOP-SECRET",
+        encoding="utf-8",
+    )
 
-    monkeypatch.setattr("src.policy_gate.UPLOAD_ROOT", up.resolve())
+    monkeypatch.setattr(
+        "src.policy_gate.UPLOAD_ROOT",
+        up.resolve(),
+    )
     monkeypatch.chdir(tmp_path)
 
     return {
@@ -58,7 +80,7 @@ def env(tmp_path, monkeypatch):
 
 
 def test_current_uploaded_file_is_allowed(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "NOR-01",
             "read_uploaded_file",
@@ -67,13 +89,14 @@ def test_current_uploaded_file_is_allowed(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "ALLOW"
-    assert r.reason == "CURRENT_UPLOAD_ONLY"
+    assert result.decision == "ALLOW"
+    assert result.reason == "CURRENT_UPLOAD_ONLY"
 
 
 def test_relative_path_to_current_upload_is_allowed(env):
-    # 相对路径 data/uploads/resume.txt 应被 resolve 规范化后判定为当前文件
-    r = authorize_tool(
+    # 相对路径经过resolve规范化后，
+    # 应被判定为当前上传文件。
+    result = authorize_tool(
         _req(
             "NOR-01",
             "read_uploaded_file",
@@ -82,11 +105,11 @@ def test_relative_path_to_current_upload_is_allowed(env):
         "data/uploads/resume.txt",
     )
 
-    assert r.decision == "ALLOW"
+    assert result.decision == "ALLOW"
 
 
 def test_current_dot_slash_is_allowed(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "NOR-02",
             "read_uploaded_file",
@@ -95,11 +118,11 @@ def test_current_dot_slash_is_allowed(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "ALLOW"
+    assert result.decision == "ALLOW"
 
 
 def test_normalized_path_is_resolved_absolute(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "NOR-01",
             "read_uploaded_file",
@@ -108,14 +131,16 @@ def test_normalized_path_is_resolved_absolute(env):
         str(env["doc"]),
     )
 
-    assert r.normalized_path == str(env["doc"].resolve())
+    assert result.normalized_path == str(
+        env["doc"].resolve()
+    )
 
 
 # ---- 工具白名单 ----
 
 
 def test_internal_tool_is_denied(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "IPI-01",
             "read_internal_file",
@@ -124,12 +149,12 @@ def test_internal_tool_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
-    assert r.reason == "TOOL_NOT_ALLOWED"
+    assert result.decision == "DENY"
+    assert result.reason == "TOOL_NOT_ALLOWED"
 
 
 def test_unknown_tool_is_denied(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "IPI-04",
             "read_anything",
@@ -138,15 +163,15 @@ def test_unknown_tool_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
-    assert r.reason == "TOOL_NOT_ALLOWED"
+    assert result.decision == "DENY"
+    assert result.reason == "TOOL_NOT_ALLOWED"
 
 
-# ---- 非当前文件 / 越权读取 ----
+# ---- 非当前文件与越权读取 ----
 
 
 def test_other_upload_file_is_denied(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "PATH-01",
             "read_uploaded_file",
@@ -155,12 +180,12 @@ def test_other_upload_file_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
-    assert r.reason == "FILE_NOT_CURRENT_UPLOAD"
+    assert result.decision == "DENY"
+    assert result.reason == "FILE_NOT_CURRENT_UPLOAD"
 
 
 def test_absolute_private_path_is_denied(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "IPI-02",
             "read_uploaded_file",
@@ -169,7 +194,7 @@ def test_absolute_private_path_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
+    assert result.decision == "DENY"
 
 
 # ---- 路径穿越 ----
@@ -177,10 +202,15 @@ def test_absolute_private_path_is_denied(env):
 
 def test_path_traversal_to_private_is_denied(env):
     traversal = str(
-        env["up"] / "sub" / ".." / ".." / "private" / "secret.txt"
+        env["up"]
+        / "sub"
+        / ".."
+        / ".."
+        / "private"
+        / "secret.txt"
     )
 
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "PATH-01",
             "read_uploaded_file",
@@ -189,11 +219,11 @@ def test_path_traversal_to_private_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
+    assert result.decision == "DENY"
 
 
 def test_double_dot_escape_is_denied(env):
-    r = authorize_tool(
+    result = authorize_tool(
         _req(
             "PATH-01",
             "read_uploaded_file",
@@ -202,23 +232,23 @@ def test_double_dot_escape_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
+    assert result.decision == "DENY"
 
 
-# ---- 大小写 ----
+# ---- 文件名大小写 ----
 
 
 @pytest.mark.skipif(
     os.name == "nt",
     reason=(
-        "Windows paths are case-insensitive; "
-        "this test only applies to case-sensitive systems."
+        "Windows路径默认不区分大小写，"
+        "此测试只适用于大小写敏感的系统。"
     ),
 )
 def test_case_variant_is_denied(env):
-    # Linux 等大小写敏感系统中，RESUME.TXT 与 resume.txt 是不同路径。
-    # Windows 默认不区分文件名大小写，因此 Windows 环境跳过此测试。
-    r = authorize_tool(
+    # Linux等大小写敏感系统中，
+    # RESUME.TXT与resume.txt属于不同路径。
+    result = authorize_tool(
         _req(
             "PATH-01",
             "read_uploaded_file",
@@ -227,8 +257,8 @@ def test_case_variant_is_denied(env):
         str(env["doc"]),
     )
 
-    assert r.decision == "DENY"
-    assert r.reason == "FILE_NOT_CURRENT_UPLOAD"
+    assert result.decision == "DENY"
+    assert result.reason == "FILE_NOT_CURRENT_UPLOAD"
 
 
 # ---- 符号链接 ----
@@ -236,9 +266,20 @@ def test_case_variant_is_denied(env):
 
 def test_symlink_escape_to_private_is_denied(env):
     link = env["up"] / "link.txt"
-    os.symlink(env["secret"], link)
 
-    r = authorize_tool(
+    try:
+        os.symlink(
+            env["secret"],
+            link,
+        )
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip(
+                "当前Windows环境没有创建符号链接的权限"
+            )
+        raise
+
+    result = authorize_tool(
         _req(
             "PATH-01",
             "read_uploaded_file",
@@ -247,16 +288,28 @@ def test_symlink_escape_to_private_is_denied(env):
         str(link),
     )
 
-    # resolve 解析到 private，UPLOAD_ROOT 不在目标父路径 -> 拒绝
-    assert r.decision == "DENY"
-    assert r.reason == "PATH_OUTSIDE_UPLOAD_ROOT"
+    # 符号链接的真实目标位于private目录，
+    # 因此必须拒绝。
+    assert result.decision == "DENY"
+    assert result.reason == "PATH_OUTSIDE_UPLOAD_ROOT"
 
 
 def test_symlink_to_internal_file_allows_real_target(env):
     link = env["up"] / "link2.txt"
-    os.symlink(env["other"], link)
 
-    r = authorize_tool(
+    try:
+        os.symlink(
+            env["other"],
+            link,
+        )
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip(
+                "当前Windows环境没有创建符号链接的权限"
+            )
+        raise
+
+    result = authorize_tool(
         _req(
             "NOR-02",
             "read_uploaded_file",
@@ -265,17 +318,21 @@ def test_symlink_to_internal_file_allows_real_target(env):
         str(link),
     )
 
-    # 目标仍在 uploads 内，放行且规范化路径指向真实文件
-    assert r.decision == "ALLOW"
-    assert r.normalized_path == str(env["other"].resolve())
+    # 符号链接的真实目标仍然位于uploads目录，
+    # 因此可以放行。
+    assert result.decision == "ALLOW"
+    assert result.normalized_path == str(
+        env["other"].resolve()
+    )
 
 
-# ---- 越过上传根 ----
+# ---- 越过上传根目录 ----
 
 
 def test_path_outside_upload_root_is_denied(env):
-    # 即使 current==target，只要落在 UPLOAD_ROOT 之外也拒绝
-    r = authorize_tool(
+    # 即使current和target相同，
+    # 只要文件位于UPLOAD_ROOT之外，也必须拒绝。
+    result = authorize_tool(
         _req(
             "IPI-02",
             "read_uploaded_file",
@@ -284,5 +341,5 @@ def test_path_outside_upload_root_is_denied(env):
         str(env["secret"]),
     )
 
-    assert r.decision == "DENY"
-    assert r.reason == "PATH_OUTSIDE_UPLOAD_ROOT"
+    assert result.decision == "DENY"
+    assert result.reason == "PATH_OUTSIDE_UPLOAD_ROOT"
