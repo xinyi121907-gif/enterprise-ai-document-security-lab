@@ -1,7 +1,6 @@
-import sys
-sys.path.insert(0, "t4test/src")
-import audit_logger
 from pathlib import Path
+
+from src import audit_logger
 
 audit_logger.LOG_PATH = Path("handoff/xrs/20261028_output_guard_audit_logger_v1/run_log_sample.jsonl")
 

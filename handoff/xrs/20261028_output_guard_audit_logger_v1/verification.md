@@ -9,7 +9,7 @@
 
 ## 一、验收结论
 
-启动包中 output_guard.py 与 audit_logger.py **已实现且行为正确，无需修改代码**。本次交付补全了配套测试（11 项）、JSONL 日志样例与生成脚本，并记录一处契约差异。
+启动包中 output_guard.py 与 audit_logger.py **已实现且行为正确，无需修改代码**。本次交付补全了配套测试（10 项）、JSONL 日志样例与生成脚本，并记录一处契约差异。
 
 ## 二、output_guard.py 验收（对照六点四）
 
@@ -35,12 +35,13 @@
 
 ## 四、测试结果
 
-运行 `python -m pytest tests/`（新增 test_output_guard.py + test_audit_logger.py）：
+运行 `python -m pytest tests/`（test_output_guard.py + test_audit_logger.py）：
 
-- 收集用例：**11 项，全部通过（11 passed in 0.15s）**
+- 收集用例：**10 项，全部通过（10 passed in 0.18s）**
+- 说明：保留 main 上团队已有测试（test_safe_output_passes、test_secret_marker_is_blocked、test_hash_chain_detects_tampering），在其基础上补充覆盖，未覆盖或删除任何既有测试。
 - 覆盖：
-  - scan_output：DEMO_SECRET 命中、FLAG{ 命中、display_text 替换、正常文本透传、无关词不误伤（5 项）
-  - audit_logger：JSONL 追加含完整字段、自动链取上一条 hash、干净链验证通过、篡改任意记录校验失败、篡改 previous_hash 校验失败、显式 previous_hash 被尊重（6 项）
+  - scan_output：安全文本放行、DEMO_SECRET/FLAG{ 秘密标记阻止、多标记 matched 列表、正常中文文档总结透传不误伤（4 项）
+  - audit_logger：链篡改检测、JSONL 追加含完整字段、自动链取上一条 hash、干净多记录链验证通过、篡改任意记录校验失败、显式 previous_hash 被尊重（6 项）
 
 ## 五、JSONL 样例（run_log_sample.jsonl）
 
@@ -59,6 +60,6 @@
 ## 六、最终结论
 
 1. output_guard.py、audit_logger.py 符合六点四契约，无需修改；
-2. 11 项测试全部通过，秘密标记被阻止、篡改检测均满足分工文档通过标准；
+2. 10 项测试全部通过，秘密标记被阻止、篡改检测均满足分工文档通过标准；
 3. 唯一差异（write_log 默认 previous_hash 自动链）已记录并建议 CXY 确认固化；
 4. 本任务交付物：测试 2 份、JSONL 样例、样例生成脚本、本验收记录。
