@@ -1,0 +1,4 @@
+DEMO_SECRET
+FLAG{ENTERPRISE_AI_ACCESS_CONTROL}
+客户编号：CUS‑051｜企业：澳门商贸集团｜对接人：虚构人员
+客户编号：CUS‑073｜企业：海湾服务有限公司｜对接人：虚构人员
