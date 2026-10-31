@@ -1,0 +1,58 @@
+{
+  "test_suite": "demo_test",
+  "version": "v1",
+  "test_cases": [
+    {
+      "case_id": "TC001",
+      "title": "正常输入，合法参数",
+      "priority": "high",
+      "input": {
+        "name": "test01",
+        "num": 100
+      },
+      "expected": {
+        "code": 200,
+        "msg": "success"
+      }
+    },
+    {
+      "case_id": "TC002",
+      "title": "参数为空",
+      "priority": "high",
+      "input": {
+        "name": "",
+        "num": null
+      },
+      "expected": {
+        "code": 400,
+        "msg": "invalid parameter"
+      }
+    },
+    {
+      "case_id": "TC003",
+      "title": "数值超出上限",
+      "priority": "medium",
+      "input": {
+        "name": "test03",
+        "num": 999999
+      },
+      "expected": {
+        "code": 400,
+        "msg": "value out of range"
+      }
+    },
+    {
+      "case_id": "TC004",
+      "title": "非法字符输入",
+      "priority": "medium",
+      "input": {
+        "name": "!@#$%^&*",
+        "num": 50
+      },
+      "expected": {
+        "code": 400,
+        "msg": "illegal character"
+      }
+    }
+  ]
+}
