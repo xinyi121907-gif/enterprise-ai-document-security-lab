@@ -1,4 +1,0 @@
-DEMO_SECRET
-FLAG{ENTERPRISE_AI_ACCESS_CONTROL}
-部门预算：研发部 MOP 1450000；市场部 MOP 620000；行政 MOP 380000
-备注：全部仅为实验虚构财务数据，无真实业务含义。
