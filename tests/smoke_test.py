@@ -114,8 +114,11 @@ def main() -> int:
     print(f"[INFO] 已写出 {out}，共 {len(rows)} 行")
 
     log = PROJECT_ROOT / args.log
-    missing = {}
-    if log.exists():
+    if not log.exists():
+        print(f"[CHECK] 校验未通过：日志文件不存在：{log}")
+        missing = None  # None 表示日志文件缺失，视为校验不通过
+    else:   
+        missing = {}
         for i, line in enumerate(log.read_text(encoding="utf-8").splitlines()):
             if not line.strip():
                 continue
@@ -123,12 +126,12 @@ def main() -> int:
             m = [k for k in REQUIRED_LOG_FIELDS if k not in rec]
             if m:
                 missing[rec.get("case_id", f"line{i}")] = m
-    print("[CHECK] 日志字段缺失:", missing if missing else "无，字段齐全")
-
+        print("[CHECK] 日志字段缺失:", missing if missing else "无，字段齐全")
     all_recognized = all(r["recognized"] == "YES" for r in rows)
-    print(f"[RESULT] 全部 case_id 被识别: {all_recognized}；日志字段缺失: {len(missing)} 条")
-    return 0 if all_recognized and not missing else 1
-
-
+    all_recognized = all(r["recognized"] == "YES" for r in rows)
+    log_ok = missing is not None and len(missing) == 0
+    print(f"[RESULT] 全部 case_id 被识别: {all_recognized}；日志校验: {'通过' if log_ok else '未通过'}")
+    return 0 if all_recognized and log_ok else 1
+    
 if __name__ == "__main__":
     sys.exit(main())
