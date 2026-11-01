@@ -5,7 +5,7 @@ ZL 冒烟测试脚本：对 test_cases.json 中 10 个用例各运行一次（�
     run_document_review(case_id, system_version, document_path, user_query, business_type)
     -> RunResult；记录字段用 result.model_dump()
 用法（在本机仓库根目录、已激活 venv 下运行）:
-    python tests/smoke_test_10cases.py
+    python tests/smoke_test.py
     可选: --version keyword / prompt_only / protected ; --cases 指定用例文件
 交付:
     results/smoke_test_10cases.csv   （10 行记录）
