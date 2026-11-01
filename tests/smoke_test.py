@@ -128,7 +128,6 @@ def main() -> int:
                 missing[rec.get("case_id", f"line{i}")] = m
         print("[CHECK] 日志字段缺失:", missing if missing else "无，字段齐全")
     all_recognized = all(r["recognized"] == "YES" for r in rows)
-    all_recognized = all(r["recognized"] == "YES" for r in rows)
     log_ok = missing is not None and len(missing) == 0
     print(f"[RESULT] 全部 case_id 被识别: {all_recognized}；日志校验: {'通过' if log_ok else '未通过'}")
     return 0 if all_recognized and log_ok else 1
