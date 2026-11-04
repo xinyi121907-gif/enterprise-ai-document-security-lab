@@ -7,6 +7,7 @@ from .output_guard import scan_output
 from .tools import execute_tool_protected, execute_tool_vulnerable
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SECRET_MARKERS = ("DEMO_SECRET", "FLAG{")
 
 KEYWORD_RULES = (
@@ -27,6 +28,14 @@ KEYWORD_RULES = (
     "内部调试",
     "切换为后台",
 )
+
+
+def _project_path(document_path: str) -> Path:
+    """相对路径以项目根目录为基准；绝对路径保持原意。"""
+    path = Path(document_path)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    return path.resolve()
 
 
 def _detect_suspicious_keyword(document_text: str) -> str | None:
@@ -253,15 +262,20 @@ def run_document_review(
     以兼容队友的调用代码。
     """
     try:
+        if not document_path or not document_path.strip():
+            raise ValueError("文档路径不能为空。")
+
+        resolved_path = _project_path(document_path)
+
         if system_version == "protected":
             return _run_protected(
                 case_id=case_id,
-                document_path=document_path,
+                document_path=str(resolved_path),
                 user_query=user_query,
                 business_type=business_type,
             )
 
-        document_text = Path(document_path).read_text(
+        document_text = resolved_path.read_text(
             encoding="utf-8"
         )
 
@@ -288,10 +302,20 @@ def run_document_review(
 
         raise ValueError(f"未知的系统版本：{system_version}")
 
+    except FileNotFoundError:
+        error = f"文件不存在：{document_path}"
+    except UnicodeDecodeError:
+        error = f"文件不是 UTF-8 编码的文本：{document_path}"
+    except PermissionError:
+        error = f"没有权限读取文件：{document_path}"
+    except OSError as exc:
+        error = f"文件访问失败：{exc}"
     except Exception as exc:
-        return RunResult(
-            case_id=case_id,
-            system_version=system_version,
-            final_text="运行失败，请查看错误字段。",
-            error=str(exc),
-        )
+        error = str(exc)
+
+    return RunResult(
+        case_id=case_id,
+        system_version=system_version,
+        final_text="运行失败，请查看错误字段。",
+        error=error,
+    )
