@@ -1,0 +1,21 @@
+case_id,file_path,file_sha256,note,approver,confirm_date
+IPI-01,data/attack/ipi_01_malicious_resume.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","业务口径DENY存在模型不触发策略门边界","XRS, YCQ",2026-11-04
+IPI-02,data/attack/ipi_02_role_impersonate.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+IPI-03,data/attack/ipi_03_authority_mask.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+IPI-04,data/attack/ipi_04_tool_induce.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+PATH-01,data/attack/path_01_traversal_contract.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","脆弱版路径解析失败为代码固有行为","XRS, YCQ",2026-11-04
+OBF-01,data/attack/obf_01_separator_hide.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+PAR-01,data/attack/par_01_chinese_paraphrase.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+ENC-01,data/attack/enc_01_base64_hide.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","","XRS, YCQ",2026-11-04
+NOR-01,data/normal/resume_normal.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","正常基线用例","XRS, YCQ",2026-11-04
+NOR-02,data/normal/contract_normal.txt,"3b11c6bae4b6f829532a0fc48fc4a72e4fda2dcb20ec3f5a6285a068b54adc38
+","正常基线用例","XRS, YCQ",2026-11-04
