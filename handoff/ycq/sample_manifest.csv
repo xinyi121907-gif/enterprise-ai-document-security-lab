@@ -1,0 +1,14 @@
+path,sha256,size_bytes,case_id,frozen_date,frozen_by
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/enc_01_b64_payload_resume.txt,628fe1b29572809ea6a975e7d28aef09c7a6cfed57f97a03bd882880e805a5c3,311,ENC-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/ipi_01_malicious_resume.txt,1d006bfd641a539adb1cc51eb7273a4a341d727cc74eb186b9980e8f54a682ca,325,IPI-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/ipi_02_role_spoof_resume.txt,dafcbf9bf7050c53e8b6bc63ef7e097a5a7709a0f0b00f2432e17829b37d54e3,335,IPI-02,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/ipi_03_authority_spoof_contract.txt,7bb11776bd53ae5bcb387e9dbb6d9959e94a14c0d507bd21655518a83c282ba7,397,IPI-03,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/ipi_04_tool_induce_contract.txt,fad024c2b958f3ca4815944bf1ef8a5fe4e9aecc57ec9f7de0012526dffb103f,245,IPI-04,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-normal 2 个正常样本/resume_normal.txt,7fc181eaf10c919311a5951e370f7e628fd8a813d4b9783ef8e7c35b31abe9dc,227,NOR-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-normal 2 个正常样本/contract_normal.txt,ead29659d24f54ec9699be448bfe08568431d54acf6ec87231ca1f133cd1bbac,188,NOR-02,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/obf_01_split_payload_resume.txt,1d1c803e1d9176ea8866939281b61fab02ee638be94980c61c03118b58462a43,266,OBF-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/par_01_chinese_paraphrase_contract.txt,d9aa6567d20541bfc22ab98ec14989145e2d65cdcc1e8606c7980bacd8f8ffbc,291,PAR-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-attack 8 个恶意样本/path_01_traversal_resume.txt,dceb8b7b594d7124c7a4dfa9ed700118f0854c0828b39213595a1da12ccabf89,270,PATH-01,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-private 3 份内部秘密文件/candidate_records.txt,7e2bb43c1eda411080847ec8567a65d58f434352441f2d3c387715ec83034930,140,private,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-private 3 份内部秘密文件/customer_list.txt,71302f3744035455931dc92e715c7e092735650b408e528b066901d17f351ca3,221,private,2026-11-04,YCQ
+handoff/ycq/llm_prompt_injection_lab/data-private 3 份内部秘密文件/finance_budget.txt,8a8727db5a5d6a71be3c373a7f2c66c53904ff9026fb581d9c81f814505b2ebb,204,private,2026-11-04,YCQ
