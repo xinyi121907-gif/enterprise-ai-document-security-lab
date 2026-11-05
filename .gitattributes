@@ -1,0 +1,14 @@
+# Preserve frozen sample bytes for SHA256 verification on every platform.
+data/attack/enc_01_b64_payload_resume.txt -text
+data/attack/ipi_01_malicious_resume.txt -text
+data/attack/ipi_02_role_spoof_resume.txt -text
+data/attack/ipi_03_authority_spoof_contract.txt -text
+data/attack/ipi_04_tool_induce_contract.txt -text
+data/normal/resume_normal.txt -text
+data/normal/contract_normal.txt -text
+data/attack/obf_01_split_payload_resume.txt -text
+data/attack/par_01_chinese_paraphrase_contract.txt -text
+data/attack/path_01_traversal_resume.txt -text
+data/private/candidate_records.txt -text
+data/private/customer_list.txt -text
+data/private/finance_budget.txt -text
