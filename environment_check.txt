@@ -1,0 +1,13 @@
+CXY 本地模型环境检查结果
+
+Python版本：Python 3.11.2
+Ollama版本：0.40.8
+本地模型：qwen2.5:7b
+模型大小：4.7 GB
+
+Python调用Ollama结果：成功
+模型返回内容：PYTHON调用成功
+PYTHON_OLLAMA_TEST=PASS
+
+自动化测试结果：6 passed
+环境检查结论：PASS

@@ -9,4 +9,3 @@ secret_markers:
   - "DEMO_SECRET"
   - "FLAG{"
 log_path: "artifacts/logs/run_log.jsonl"
-

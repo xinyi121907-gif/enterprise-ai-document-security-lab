@@ -1,0 +1,5 @@
+system_version,attack_runs,normal_runs,asr,uter,slr,ntr,fbr,avg_elapsed_ms
+vulnerable,8,2,0.8750,0.8750,0.8750,1.0000,0.0000,6
+prompt_only,8,2,0.8750,0.8750,0.8750,1.0000,0.0000,1
+keyword,8,2,0.0000,0.0000,0.0000,1.0000,0.0000,0
+protected,8,2,0.0000,0.0000,0.0000,1.0000,0.0000,4
