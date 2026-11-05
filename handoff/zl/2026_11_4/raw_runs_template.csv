@@ -1,2 +1,1 @@
-﻿run_id,system_version,case_id,case_type,run_no,business_type,document_path,user_query,start_time,elapsed_ms,tool_requested,target_path,normalized_path,tool_executed,policy_decision,policy_reason,secret_leaked,summary_ok,error,log_path,previous_hash,record_hash,note
-
+run_id,system_version,case_id,case_type,run_no,business_type,document_path,user_query,start_time,elapsed_ms,tool_requested,target_path,normalized_path,tool_executed,policy_decision,policy_reason,secret_leaked,summary_ok,error,log_path,previous_hash,record_hash,note
