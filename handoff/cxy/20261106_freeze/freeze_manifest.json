@@ -1,0 +1,314 @@
+{
+  "date": "2026-11-06",
+  "owner": "CXY",
+  "source_commit": "052d8da15da3086b0d50c4f84249ec3da079a033",
+  "model": {
+    "name": "qwen2.5:7b",
+    "model": "qwen2.5:7b",
+    "modified_at": "2026-10-27T09:24:09.0335334+08:00",
+    "size": 4683087332,
+    "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen2",
+      "families": [
+        "qwen2"
+      ],
+      "parameter_size": "7.6B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 32768,
+      "embedding_length": 3584,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools"
+    ]
+  },
+  "config": {
+    "schema_version": "1.0.0",
+    "model": "qwen2.5:7b",
+    "temperature": 0,
+    "request_timeout_seconds": 60,
+    "max_tool_rounds": 3,
+    "allowed_upload_root": "data/uploads",
+    "private_root": "data/private",
+    "secret_markers": [
+      "DEMO_SECRET",
+      "FLAG{"
+    ],
+    "log_path": "artifacts/logs/run_log.jsonl"
+  },
+  "effective_behavior": {
+    "model_calls_per_review": 1,
+    "tool_requests_processed_max": 1,
+    "max_tool_rounds_config_not_consumed": true,
+    "normal_summary_scoring": "all expected_normal_points case-insensitive substrings",
+    "frozen_versions": [
+      "vulnerable",
+      "prompt_only",
+      "keyword",
+      "protected"
+    ]
+  },
+  "validation": {
+    "passed": 35,
+    "skipped": 3,
+    "failed": 0,
+    "skip_reasons": [
+      "Windows case-insensitive paths",
+      "symlink privilege unavailable (2)"
+    ],
+    "formal_experiment_run": false
+  },
+  "prompt_snapshot_sha256": "e2dabe1c7956a863399814eddeccc64bf59ffd1b79f8b55c58306b12c8aa2b5b",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "c118953fd043e63f69173005039d9042c1a69e7d59db220dbc7906610a7084da",
+      "size_bytes": 1622,
+      "normalization": "LF"
+    },
+    {
+      "path": "app.py",
+      "sha256": "b837021beca9a2dfef57b0cf7779741c49f51f1c9f6e5d8ef30f476d87acea54",
+      "size_bytes": 5083,
+      "normalization": "LF"
+    },
+    {
+      "path": "config.yaml",
+      "sha256": "0d21899d6d52d9810e990a99ff49d8472334475c3ad674a2335e5d721d6c50de",
+      "size_bytes": 257,
+      "normalization": "LF"
+    },
+    {
+      "path": "data/attack/enc_01_b64_payload_resume.txt",
+      "sha256": "628fe1b29572809ea6a975e7d28aef09c7a6cfed57f97a03bd882880e805a5c3",
+      "size_bytes": 311,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/ipi_01_malicious_resume.txt",
+      "sha256": "1d006bfd641a539adb1cc51eb7273a4a341d727cc74eb186b9980e8f54a682ca",
+      "size_bytes": 325,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/ipi_02_role_spoof_resume.txt",
+      "sha256": "dafcbf9bf7050c53e8b6bc63ef7e097a5a7709a0f0b00f2432e17829b37d54e3",
+      "size_bytes": 335,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/ipi_03_authority_spoof_contract.txt",
+      "sha256": "7bb11776bd53ae5bcb387e9dbb6d9959e94a14c0d507bd21655518a83c282ba7",
+      "size_bytes": 397,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/ipi_04_tool_induce_contract.txt",
+      "sha256": "fad024c2b958f3ca4815944bf1ef8a5fe4e9aecc57ec9f7de0012526dffb103f",
+      "size_bytes": 245,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/obf_01_split_payload_resume.txt",
+      "sha256": "1d1c803e1d9176ea8866939281b61fab02ee638be94980c61c03118b58462a43",
+      "size_bytes": 266,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/par_01_chinese_paraphrase_contract.txt",
+      "sha256": "d9aa6567d20541bfc22ab98ec14989145e2d65cdcc1e8606c7980bacd8f8ffbc",
+      "size_bytes": 291,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/attack/path_01_traversal_resume.txt",
+      "sha256": "e51686b293c04eab85ec1a0e17f2047ce52576c5e0ed369d16336016a6b895f6",
+      "size_bytes": 271,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/normal/contract_normal.txt",
+      "sha256": "ead29659d24f54ec9699be448bfe08568431d54acf6ec87231ca1f133cd1bbac",
+      "size_bytes": 188,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/normal/resume_normal.txt",
+      "sha256": "7fc181eaf10c919311a5951e370f7e628fd8a813d4b9783ef8e7c35b31abe9dc",
+      "size_bytes": 227,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/private/candidate_records.txt",
+      "sha256": "7e2bb43c1eda411080847ec8567a65d58f434352441f2d3c387715ec83034930",
+      "size_bytes": 140,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/private/customer_list.txt",
+      "sha256": "71302f3744035455931dc92e715c7e092735650b408e528b066901d17f351ca3",
+      "size_bytes": 221,
+      "normalization": "exact"
+    },
+    {
+      "path": "data/private/finance_budget.txt",
+      "sha256": "8a8727db5a5d6a71be3c373a7f2c66c53904ff9026fb581d9c81f814505b2ebb",
+      "size_bytes": 204,
+      "normalization": "exact"
+    },
+    {
+      "path": "handoff/ycq/sample_manifest.csv",
+      "sha256": "44e209b6b5a0cd9a8f0d5f585904eff46a5df7055bf71a8bbde93e147e36e1e9",
+      "size_bytes": 1751,
+      "normalization": "LF"
+    },
+    {
+      "path": "handoff/ycq/test_cases_final.json",
+      "sha256": "da9719ce69e0adcdffe36a505aa4e662cc21fb5108d02748042cf1669a838133",
+      "size_bytes": 4479,
+      "normalization": "LF"
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "0bbdc59ac2adfc43df8788e2aaad6fe0826b836ee554438635617d7cb126f799",
+      "size_bytes": 91,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "b5ab1d247a2189f1ed4f50c878a878c432cc1e0747601a879e711518bae25a36",
+      "size_bytes": 44,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/audit_logger.py",
+      "sha256": "c0f480e1a2ed67f28ce10f458629a1ae43942358a9534b664c102da1d51e8b79",
+      "size_bytes": 1844,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/contracts.py",
+      "sha256": "fa8e2759c89a1d7e7bfc19b254a04a621cce46ef41c149e4e45cbb6a194639e9",
+      "size_bytes": 778,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/model_client.py",
+      "sha256": "653508ed7a98c7b9367fba18da92ee01c2b5c8cd656beb90de293e79991489a2",
+      "size_bytes": 8548,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/output_guard.py",
+      "sha256": "3b54e268f97dabec687b376dce8e6ab847eb49fdf814da77fba7b5d060055993",
+      "size_bytes": 396,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/pipeline.py",
+      "sha256": "dd26c18a9a1b0141bbf2bbd083d2cac0d1d3415292ea8b40aabad2b9e96a1869",
+      "size_bytes": 11670,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/policy_gate.py",
+      "sha256": "4b1e3c96fbeb635daffc0d7f4ed08339a54e90eebf4fbfa30e544176bdfab5de",
+      "size_bytes": 1265,
+      "normalization": "LF"
+    },
+    {
+      "path": "src/tools.py",
+      "sha256": "09fce4c4bb0b0a3709e0962d01dcfc1169d33b916e744240baffa227469b6d05",
+      "size_bytes": 1369,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/check_ollama.py",
+      "sha256": "063ac1e25291a774c2842e97bc5c6e141fb77186300335320a321a27d543c5f0",
+      "size_bytes": 762,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/check_vulnerable_v01.py",
+      "sha256": "2543e7bcebd55eb3be1afc333200bf6223ca0092859d4c37566c6c6b6d0b2c30",
+      "size_bytes": 1255,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/end_to_end_protected.py",
+      "sha256": "30e52c1b213a678993f90c571c02606ba033562cc55641390e7d41ca86e6e386",
+      "size_bytes": 3293,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/metrics_script.py",
+      "sha256": "346009f1c71e5ef681780b86aad80bed1234e1eda3138d92ec69294818d43e14",
+      "size_bytes": 6017,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/run_experiment.py",
+      "sha256": "3118bab44323f512e25e4db635dd59c0d883293c724c3d9cb6dea35b9ed48300",
+      "size_bytes": 10987,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/smoke_test.py",
+      "sha256": "009148816c285118d35f60fbec6e9a6d81584b4a557792a12fa536ac1dc75d9f",
+      "size_bytes": 5666,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_audit_logger.py",
+      "sha256": "ec14a5e0a665a9f303e3d39794781344180311aa064435d64bc529614288b81b",
+      "size_bytes": 2227,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_cases.json",
+      "sha256": "da9719ce69e0adcdffe36a505aa4e662cc21fb5108d02748042cf1669a838133",
+      "size_bytes": 4479,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_freeze_integration.py",
+      "sha256": "2f3d64bd83ba63e1960579b946862c1533d4b2ae487daeb94522465eff4f21d6",
+      "size_bytes": 1096,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_integration_protected.py",
+      "sha256": "53c8e5e9bc4f8c5de720d4b90a9160dace92aa25f230323b7e23aec28e9775f2",
+      "size_bytes": 4077,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_output_guard.py",
+      "sha256": "2e2d1fbc119cb045c04fce465dfdb85e1e7b30364805628d6d11f77fadedb785",
+      "size_bytes": 831,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_policy_gate.py",
+      "sha256": "2440b920b97d184872310fec433386fa7b5bc6d43bcce43a7583bc6397e7dd8d",
+      "size_bytes": 7282,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_pre_nov4_repairs.py",
+      "sha256": "dfc0e626d29521d0597ca5220074cd41ee5b51ef3755e2d066768912bc26c743",
+      "size_bytes": 2557,
+      "normalization": "LF"
+    },
+    {
+      "path": "tests/test_protected_pipeline.py",
+      "sha256": "8a4e7716969ae29ff1f510e9e095aea7fa1f3683e3705c0b49bf19d048d86af5",
+      "size_bytes": 690,
+      "normalization": "LF"
+    }
+  ]
+}

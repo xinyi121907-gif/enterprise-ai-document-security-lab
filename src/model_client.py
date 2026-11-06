@@ -15,11 +15,15 @@ import json
 from typing import Any, Dict, List, Literal, Optional
 
 import ollama
+from pathlib import Path
+import yaml
+
+CONFIG = yaml.safe_load((Path(__file__).resolve().parents[1] / "config.yaml").read_text(encoding="utf-8"))
 
 
 PromptMode = Literal["vulnerable", "prompt_only"]
 
-DEFAULT_MODEL = "qwen2.5:7b"
+DEFAULT_MODEL = CONFIG["model"]
 
 
 def _tool_definitions() -> List[Dict[str, Any]]:
@@ -237,7 +241,7 @@ def request_review(
     if prompt_mode not in ("vulnerable", "prompt_only"):
         raise ValueError(f"不支持的 prompt_mode：{prompt_mode}")
 
-    response = ollama.chat(
+    response = ollama.Client(timeout=CONFIG["request_timeout_seconds"]).chat(
         model=model_name,
         messages=[
             {
@@ -255,7 +259,7 @@ def request_review(
         ],
         tools=_tool_definitions(),
         options={
-            "temperature": 0,
+            "temperature": CONFIG["temperature"],
         },
     )
 

@@ -12,3 +12,31 @@ data/attack/path_01_traversal_resume.txt -text
 data/private/candidate_records.txt -text
 data/private/customer_list.txt -text
 data/private/finance_budget.txt -text
+
+# Frozen code and manifests use LF consistently.
+app.py text eol=lf
+config.yaml text eol=lf
+requirements.txt text eol=lf
+src/audit_logger.py text eol=lf
+src/contracts.py text eol=lf
+src/model_client.py text eol=lf
+src/output_guard.py text eol=lf
+src/pipeline.py text eol=lf
+src/policy_gate.py text eol=lf
+src/tools.py text eol=lf
+src/__init__.py text eol=lf
+tests/check_ollama.py text eol=lf
+tests/check_vulnerable_v01.py text eol=lf
+tests/end_to_end_protected.py text eol=lf
+tests/metrics_script.py text eol=lf
+tests/run_experiment.py text eol=lf
+tests/smoke_test.py text eol=lf
+tests/test_audit_logger.py text eol=lf
+tests/test_freeze_integration.py text eol=lf
+tests/test_integration_protected.py text eol=lf
+tests/test_output_guard.py text eol=lf
+tests/test_policy_gate.py text eol=lf
+tests/test_protected_pipeline.py text eol=lf
+tests/test_cases.json text eol=lf
+handoff/ycq/test_cases_final.json text eol=lf
+handoff/ycq/sample_manifest.csv text eol=lf

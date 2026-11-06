@@ -41,6 +41,7 @@ with st.sidebar:
     system_version = st.selectbox(
         "系统版本",
         list(VERSION_LABELS.keys()),
+        index=3,
         format_func=lambda value: VERSION_LABELS[value],
     )
 
@@ -59,7 +60,7 @@ if system_version == "protected":
 else:
     uploaded_file = None
     case_file = st.text_input(
-        "测试文件路径",
+        "测试文件路径（相对于项目根目录）",
         "data/normal/resume_normal.txt",
     )
 
@@ -79,26 +80,39 @@ if st.button(
             st.error("请先上传本次要审阅的 TXT 文件。")
             st.stop()
 
-        file_bytes = uploaded_file.getvalue()
-
-        if len(file_bytes) > MAX_UPLOAD_BYTES:
-            st.error("文件超过 2 MB，请选择更小的 TXT 文件。")
-            st.stop()
-
         try:
-            file_bytes.decode("utf-8")
-        except UnicodeDecodeError:
-            st.error("文件不是 UTF-8 编码的文本，请转换后再上传。")
-            st.stop()
+            file_bytes = uploaded_file.getvalue()
 
-        # 文件名由服务器生成，不使用用户上传时自带的文件名作为路径。
-        UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
-        path = UPLOAD_ROOT / f"{uuid4().hex}.txt"
-        with path.open("xb") as output_file:
-            output_file.write(file_bytes)
+            if len(file_bytes) > MAX_UPLOAD_BYTES:
+                st.error("文件超过 2 MB，请选择更小的 TXT 文件。")
+                st.stop()
+
+            try:
+                file_bytes.decode("utf-8")
+            except UnicodeDecodeError:
+                st.error("文件不是 UTF-8 编码的文本，请转换后再上传。")
+                st.stop()
+
+            # 文件名由服务器生成，不使用上传文件自带的名称作为路径。
+            UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+            path = UPLOAD_ROOT / f"{uuid4().hex}.txt"
+            with path.open("xb") as output_file:
+                output_file.write(file_bytes)
+
+        except OSError as exc:
+            st.error(f"保存上传文件失败：{exc}")
+            st.stop()
 
     else:
+        if not case_file or not case_file.strip():
+            st.error("请填写测试文件路径。")
+            st.stop()
+
+        # 相对路径固定以项目根目录为基准，与终端所在目录无关。
         path = Path(case_file)
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+        path = path.resolve()
 
         if not path.is_file():
             st.error(f"文件不存在：{case_file}")
