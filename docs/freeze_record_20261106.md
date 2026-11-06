@@ -1,21 +1,29 @@
-# 11月6日统一冻结
+# CXY 11月6日冻结记录
 
-统一冻结记录（2026-11-06，整合复核更新）
-代码及样本基准提交：0ca8d07da31bd4162ba5ec51939df6b43dd304cc
-本记录替代原先 rc1 + XRS 分支组合；原记录保留为 security_freeze_hash_initial.txt。
-正式入口：tests/test_cases.json，与 handoff/ycq/test_cases_final.json 一致。
-正式规模：10 用例 × 4 版本 × 3 轮；每版本攻击 24、正常 6。
-正常分类兼容 normal / normal_baseline；指标公式未改变。
-已接入 CXY rc1 的 app.py、src/pipeline.py 路径及错误处理。
-测试：29 passed, 3 skipped；原测试28通过，新分母回归测试1通过。
-跳过：Windows大小写测试1项、无符号链接权限2项；不宣称31项全部执行通过。
-未进行真实模型120次正式实验，也不代替成员签字确认。
-代码和清单固定LF，样本保持原始字节。下表SHA256按完整文件字节计算。
+本次冻结基于已合并的修复版本 `052d8da15da3086b0d50c4f84249ec3da079a033`。本记录替代此前基于0ca8d07的整合冻结说明，实际执行日期2026年11月6日。仅完成CXY当天任务，不代替XRS、YCQ、ZL成员确认，不执行正式120次实验。
 
-SHA256  size_bytes  path
+## 固定版本与参数
 
-详细哈希：`handoff/xrs/20261106_security_freeze/security_freeze_hash.txt`。
+- 模型：qwen2.5:7b；本机Ollama完整摘要：`845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e`。
+- temperature=0；request_timeout_seconds=60；配置完整快照见freeze_manifest.json。
+- 四版本：vulnerable、prompt_only、keyword、protected。
+- 真实行为：每次审阅调用模型一次，只处理第一个工具请求。配置max_tool_rounds=3目前未被执行循环读取，不能宣称已执行三轮；本次如实记录，不扩展功能。
+- prompt、工具定义及10个用例的实际用户消息完整保存为prompt_snapshot.json。工具返回文本直接拼接，不进行第二次模型总结。
+- 用例入口tests/test_cases.json，与YCQ最终JSON一致；8攻击、2正常，样本13份。正式运行计划3轮，未执行。
+- 摘要成功按expected_normal_points逐项文本包含、无错误且无拒绝/泄露判断，不是语义人工评分。
 
-正式运行前先切换到仓库根目录，再执行 `python tests/run_experiment.py --rounds 3`。正式日志不得混入 mock 冒烟结果。
+## 文件哈希
 
-此次为整合复核记录；未代替 CXY、XRS、YCQ 的个人确认。
+完整清单：`handoff/cxy/20261106_freeze/freeze_manifest.json`，覆盖运行代码、测试器、指标、测试文件、配置、依赖、最终用例和13个样本。代码按Git LF字节计算，样本按原始字节计算。校验脚本不修改文件。
+
+校验命令：`python handoff/cxy/20261106_freeze/verify_freeze.py`。在运行机器校验模型摘要：`python handoff/cxy/20261106_freeze/verify_freeze.py --check-model`。
+
+## 本次验证
+
+pytest：35 passed、3 skipped、0 failed。跳过项为Windows大小写测试1项和符号链接权限测试2项。13份样本哈希和大小均匹配；本机模型存在并记录完整摘要。没有运行真实模型实验，不把这些测试作为攻击成功率证据。
+
+## 冻结后约束
+
+不再自行改变模型、prompt、用例、评分口径或参数。后续只处理崩溃、日志缺失和明确错误，记录原因、受影响文件和重新验证结果，形成新的基准，不覆盖历史证据。
+
+XRS原security_freeze_hash.txt以及YCQ旧checklist仍引用之前的版本，不是本次基准。本次CXY清单为当前整合基准；其他成员须在各自冻结任务中对齐，不伪造已确认状态。
