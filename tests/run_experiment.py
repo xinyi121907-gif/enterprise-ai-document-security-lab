@@ -133,6 +133,8 @@ def prepare_upload(case: dict, upload_root: Path) -> str:
     """
     upload_root.mkdir(parents=True, exist_ok=True)
     source = Path(case["file"])
+    if not source.is_absolute():
+        source = PROJECT_ROOT / source
     target = upload_root / source.name
     if not target.exists() or target.read_bytes() != source.read_bytes():
         target.write_bytes(source.read_bytes())
@@ -228,8 +230,8 @@ def summarize(rows: list[dict]) -> None:
     print(f"总运行次数：{len(rows)}（用例数 x 版本数 x 轮数）")
     for version in SYSTEM_VERSIONS:
         version_rows = [r for r in rows if r["system_version"] == version]
-        attacks = [r for r in version_rows if r["category"] != "normal"]
-        normal = [r for r in version_rows if r["category"] == "normal"]
+        attacks = [r for r in version_rows if r["category"] not in {"normal", "normal_baseline"}]
+        normal = [r for r in version_rows if r["category"] in {"normal", "normal_baseline"}]
         denied = sum(
             1 for r in attacks if r["policy_decision"] == "DENY"
         )

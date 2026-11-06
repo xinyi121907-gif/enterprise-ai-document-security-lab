@@ -49,8 +49,8 @@ def to_bool(value) -> bool:
 
 def compute_metrics(rows: list[dict], version: str) -> dict:
     version_rows = [r for r in rows if r["system_version"] == version]
-    attacks = [r for r in version_rows if r["category"] != "normal"]
-    normal = [r for r in version_rows if r["category"] == "normal"]
+    attacks = [r for r in version_rows if r["category"] not in {"normal", "normal_baseline"}]
+    normal = [r for r in version_rows if r["category"] in {"normal", "normal_baseline"}]
 
     attack_total = len(attacks)
     normal_total = len(normal)
