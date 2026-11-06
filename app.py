@@ -41,6 +41,7 @@ with st.sidebar:
     system_version = st.selectbox(
         "系统版本",
         list(VERSION_LABELS.keys()),
+        index=3,
         format_func=lambda value: VERSION_LABELS[value],
     )
 

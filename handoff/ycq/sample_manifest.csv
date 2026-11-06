@@ -8,7 +8,7 @@ data/normal/resume_normal.txt,7fc181eaf10c919311a5951e370f7e628fd8a813d4b9783ef8
 data/normal/contract_normal.txt,ead29659d24f54ec9699be448bfe08568431d54acf6ec87231ca1f133cd1bbac,188,NOR-02,2026-11-04,YCQ
 data/attack/obf_01_split_payload_resume.txt,1d1c803e1d9176ea8866939281b61fab02ee638be94980c61c03118b58462a43,266,OBF-01,2026-11-04,YCQ
 data/attack/par_01_chinese_paraphrase_contract.txt,d9aa6567d20541bfc22ab98ec14989145e2d65cdcc1e8606c7980bacd8f8ffbc,291,PAR-01,2026-11-04,YCQ
-data/attack/path_01_traversal_resume.txt,dceb8b7b594d7124c7a4dfa9ed700118f0854c0828b39213595a1da12ccabf89,270,PATH-01,2026-11-04,YCQ
+data/attack/path_01_traversal_resume.txt,e51686b293c04eab85ec1a0e17f2047ce52576c5e0ed369d16336016a6b895f6,271,PATH-01,2026-11-04,YCQ
 data/private/candidate_records.txt,7e2bb43c1eda411080847ec8567a65d58f434352441f2d3c387715ec83034930,140,private,2026-11-04,YCQ
 data/private/customer_list.txt,71302f3744035455931dc92e715c7e092735650b408e528b066901d17f351ca3,221,private,2026-11-04,YCQ
 data/private/finance_budget.txt,8a8727db5a5d6a71be3c373a7f2c66c53904ff9026fb581d9c81f814505b2ebb,204,private,2026-11-04,YCQ

@@ -12,9 +12,7 @@
 
 输出：
     results/raw_runs.csv   全部运行明细（指标脚本的输入，供证据对齐）
-    artifacts/logs/run_log.jsonl   vulnerable/prompt_only/keyword 由本实验器写入；
-                                   protected 由 pipeline 写入（避免重复），
-                                   每条记录进入哈希串联审计链
+    artifacts/logs/run_log.jsonl   四版本统一由 pipeline 写入，每次运行一条哈希链记录
 """
 
 from __future__ import annotations
@@ -57,7 +55,7 @@ RAW_RUN_FIELDS = [
     "secret_leaked",
     "summary_ok",
     "error",
-    "elapsed_ms",
+    "elapsed_ms", "unauthorized_tool_executed", "target_path", "normalized_path", "record_hash", "log_path", "mock",
 ]
 
 
@@ -150,7 +148,7 @@ def run_one(
 ) -> dict:
     """单次运行：四套系统使用完全相同的 case 输入与参数。"""
     start = time.perf_counter()
-    if use_mock and version in ("vulnerable", "prompt_only", "keyword"):
+    if use_mock:
         from unittest import mock
 
         # pipeline 在模块导入时已把 request_review 绑定到本地命名空间，
@@ -165,6 +163,8 @@ def run_one(
                 document_path=document_path,
                 user_query=case["user_query"],
                 business_type=case["business_type"],
+                expected_normal_points=case["expected_normal_points"],
+                audit_context={"run_no": run_no, "category": case["category"], "mock": use_mock},
             )
     else:
         result = run_document_review(
@@ -173,8 +173,12 @@ def run_one(
             document_path=document_path,
             user_query=case["user_query"],
             business_type=case["business_type"],
+                expected_normal_points=case["expected_normal_points"],
+                audit_context={"run_no": run_no, "category": case["category"], "mock": use_mock},
         )
-    elapsed_ms = int((time.perf_counter() - start) * 1000)
+    from src import audit_logger
+    saved = json.loads(audit_logger.LOG_PATH.read_text(encoding="utf-8").splitlines()[-1])
+    elapsed_ms = saved["elapsed_ms"]
 
     row = {
         **result.model_dump(),
@@ -184,34 +188,8 @@ def run_one(
         "user_query": case["user_query"],
         "run_no": run_no,
         "elapsed_ms": elapsed_ms,
+        "unauthorized_tool_executed": saved["unauthorized_tool_executed"], "target_path": saved["target_path"], "normalized_path": saved["normalized_path"], "record_hash": saved["record_hash"], "log_path": str(audit_logger.LOG_PATH), "mock": use_mock,
     }
-
-    # protected 的审计日志由 pipeline 写入（含策略门与输出检测上下文），
-    # 实验器跳过以避免同一次运行在 JSONL 中重复记录。
-    if version != "protected":
-        log_record = {
-            key: row[key]
-            for key in (
-                "case_id",
-                "system_version",
-                "final_text",
-                "tool_requested",
-                "tool_executed",
-                "policy_decision",
-                "policy_reason",
-                "secret_leaked",
-                "summary_ok",
-                "error",
-            )
-        }
-        log_record.update(
-            {
-                "business_type": case["business_type"],
-                "run_no": run_no,
-                "elapsed_ms": elapsed_ms,
-            }
-        )
-        write_log(log_record)
 
     return row
 

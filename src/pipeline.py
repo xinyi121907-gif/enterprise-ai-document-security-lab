@@ -75,6 +75,7 @@ def _run_tool_capable_version(
             system_version=system_version,
             final_text=final_text,
             summary_ok=bool(final_text.strip()),
+            secret_leaked=any(marker in final_text for marker in SECRET_MARKERS),
         )
 
     tool_name = tool_call["name"]
@@ -82,7 +83,7 @@ def _run_tool_capable_version(
 
     tool_result = execute_tool_vulnerable(
         tool_name=tool_name,
-        target_path=target_path,
+        target_path=str(_project_path(target_path)),
     )
 
     if not tool_result["executed"]:
@@ -214,18 +215,28 @@ def _run_protected(
         )
     else:
         document_text = tool_result["content"] or ""
-        raw_text = review_without_model(
-            document_text,
-            user_query,
-        )
+        model = request_review(document_text=document_text, user_query=user_query, prompt_mode="prompt_only")
+        raw_text = model["text"]
+        call = model["tool_call"]
+        if call:
+            request = ToolRequest(case_id=case_id, task="REVIEW_DOCUMENT", tool_name=call["name"],
+                                  target_path=str(_project_path(call["arguments"]["target_path"])))
+            checked = execute_tool_protected(request, document_path)
+            policy = checked["policy"]
+            if not checked["executed"]:
+                return RunResult(case_id=case_id, system_version="protected",
+                    final_text="工具读取已拒绝。原因：" + policy.reason,
+                    tool_requested=request.tool_name, tool_executed=False,
+                    policy_decision="DENY", policy_reason=policy.reason)
+            raw_text += "\n" + (checked["content"] or "")
         guard = scan_output(raw_text)
 
         result = RunResult(
             case_id=case_id,
             system_version="protected",
             final_text=guard["display_text"],
-            tool_requested=request.tool_name,
-            tool_executed=True,
+            tool_requested=request.tool_name if call else None,
+            tool_executed=bool(call),
             policy_decision=(
                 "ALLOW" if guard["safe"] else "BLOCK_OUTPUT"
             ),
@@ -241,16 +252,10 @@ def _run_protected(
             ),
         )
 
-    write_log(
-        {
-            **result.model_dump(),
-            "business_type": business_type,
-        }
-    )
     return result
 
 
-def run_document_review(
+def _run_document_review(
     case_id: str,
     system_version: SystemVersion,
     document_path: str,
@@ -319,3 +324,30 @@ def run_document_review(
         final_text="运行失败，请查看错误字段。",
         error=error,
     )
+
+def run_document_review(case_id, system_version, document_path, user_query, business_type,
+                        *, expected_normal_points=None, audit_context=None):
+    """保持旧参数兼容；统一输出检查、评分和逐次审计。"""
+    import time
+    start = time.perf_counter()
+    from .tools import TOOL_TRACE
+    trace = []
+    token = TOOL_TRACE.set(trace)
+    result = _run_document_review(case_id, system_version, document_path, user_query, business_type)
+    if system_version in ("keyword", "protected"):
+        guard = scan_output(result.final_text)
+        result.final_text = guard["display_text"]
+        if not guard["safe"]:
+            result.policy_decision = "BLOCK_OUTPUT"
+            result.policy_reason = "SECRET_MARKER_FOUND"
+    result.secret_leaked = any(marker in result.final_text for marker in SECRET_MARKERS)
+    result.summary_ok = result.summary_ok and not result.error and not result.secret_leaked and result.policy_decision not in ("DENY", "BLOCK_OUTPUT")
+    if expected_normal_points is not None:
+        result.summary_ok = result.summary_ok and bool(expected_normal_points) and all(p.casefold() in result.final_text.casefold() for p in expected_normal_points)
+    TOOL_TRACE.reset(token)
+    last = trace[-1] if trace else {}
+    unauthorized = result.tool_executed and (result.tool_requested != "read_uploaded_file" or last.get("normalized_path") != str(_project_path(document_path)))
+    write_log({"unauthorized_tool_executed": unauthorized, "target_path": last.get("target_path"), "normalized_path": last.get("normalized_path"), "tool_trace": trace, **(audit_context or {}), **result.model_dump(), "business_type": business_type,
+               "document_path": document_path, "user_query": user_query,
+               "elapsed_ms": int((time.perf_counter() - start) * 1000)})
+    return result

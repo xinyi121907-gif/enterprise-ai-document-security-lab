@@ -55,7 +55,14 @@ streamlit run app.py
 
 禁止直接在 `main` 上开发。合并前必须运行 `pytest -q`。
 
-## 当前启动包状态
+## 截至11月4日的整合修正
 
-接口、目录、理由码、测试编号与样例数据已经固定。`pipeline.py` 和 `app.py` 是可启动骨架；各成员按 `docs/TEAM_START_HERE.md` 继续完成自己的正式模块。
+四个版本均通过同一个 Ollama 模型入口审阅。protected 先授权读取当前上传文件，再将模型提出的工具请求交给权限门；keyword 与 protected 均检查最终输出。界面默认 protected。
 
+测试用例入口为 `tests/test_cases.json`，与 YCQ 最终清单一致。正常任务在批量测试中按 `expected_normal_points` 的逐项文本包含判定；不是人工语义评分。一次审阅处理模型返回的第一个工具请求，不进行多轮代理循环。
+
+开发冒烟可执行 `python tests/run_experiment.py --rounds 1 --limit 2 --mock`；mock 仅验证流程，不能作实验结论。运行会追加审计日志，必须与正式数据分离。所有版本由 pipeline 统一写一条运行记录，CSV 的 record_hash 对应 JSONL。
+
+指标脚本支持 CSV 或经哈希链校验的 JSONL 输入：`python tests/metrics_script.py --input <文件路径>`。旧日志缺少轮次和分类时会拒绝复算。
+
+本次修复与文档勘误见 `docs/pre_nov4_repairs.md`。没有执行11月6日冻结或后续正式实验；已有冻结清单属于修复前版本，不能用来校验本次代码。
