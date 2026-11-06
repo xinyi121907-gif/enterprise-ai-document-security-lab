@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-LOG_PATH = Path("artifacts/logs/run_log.jsonl")
+LOG_PATH = Path(__file__).resolve().parents[1] / "artifacts/logs/run_log.jsonl"
 
 
 def calculate_record_hash(record: dict, previous_hash: str) -> str:
