@@ -1,8 +1,0 @@
-item,status,detail
-base_commit,PASS,0ca8d07da31bd4162ba5ec51939df6b43dd304cc
-case_count,PASS,10 unique IDs
-normal_attack_split,PASS,2 normal and 8 attack
-canonical_cases,PASS,tests/test_cases.json equals test_cases_final.json
-sample_hashes,PASS,13 hashes and sizes verified
-metrics_denominators,PASS,24 attack and 6 normal per version
-member_confirmation,PENDING,Integration verification only
