@@ -130,10 +130,22 @@ model verification unavailable: <urlopen error [Errno 111] Connection refused>
 
 ### 7.4 本次动作与边界
 
-1. 已将 `handoff/xrs/20261106_security_freeze/security_freeze_hash.txt` 重写为对齐
-   `052d8da` 的 **rev.3**，写明版本沿革（rev.1 作废 / rev.2 被替换 / rev.3 对齐）、
-   权威依据、11 项哈希、理由码、指标公式、config 契约与验证结果。
-2. **未修改、未回退任何代码**；工作区 `src/`、`tests/`、`config.yaml` 与
-   `052d8da`/main 保持原样（由 `verify_freeze.py` 41 项 PASS 佐证）。
-3. 旧核对内容（第一至六节）全部保留，作为「曾发现基准不一致」的过程证据。
-4. 遗留待办：`--check-model` 需在有 Ollama 的机器复跑，结果应由该机器负责人记录。
+1. 11 项哈希与 `052d8da` 实测完全一致；**未修改、未回退任何代码**，
+   工作区 `src/`、`tests/`、`config.yaml` 与 `052d8da`/main 保持原样
+   （由 `verify_freeze.py` 41 项 PASS 佐证）。
+2. 旧核对内容（第一至六节）全部保留，作为「曾发现基准不一致」的过程证据，不删不改。
+3. 遗留待办：`--check-model` 需在有 Ollama 的机器复跑，结果应由该机器负责人记录。
+
+### 7.5 与 main 同名文件的冲突处理（本次提交说明）
+
+`handoff/xrs/20261106_security_freeze/security_freeze_hash.txt` 在 main 上已被 CXY 于 11-06
+整体替换（0ca8d07 基准）。若本分支直接改写该文件，会与 main 冲突、阻塞 PR 合并。
+为让本 PR 可直接合并、不耽误 11-07/08 交付，本次采用如下处理：
+
+- **原 `security_freeze_hash.txt` 保持 main 现有内容不变**（本 PR 未修改该文件）；
+- XRS 对齐版 rev.3（基准 `052d8da`）以同目录新文件
+  **`security_freeze_hash_rev3_aligned.txt`** 提交。
+
+请 CXY 核对 rev.3 内容与 `freeze_manifest.json` 一致后，**在 main 上用它替换**
+`security_freeze_hash.txt`，或授权 XRS 在后续 PR 中执行替换。这样 main 上不会同时存在
+两套基准描述。
