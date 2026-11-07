@@ -1,0 +1,9 @@
+11-07/08 逐轮校验汇总（本次为回归测试专用，环境无运行数据时 4 项端到端用例自动 skip）
+
+边界 1 非法 decision：test_invalid_decision_rejected_in_all_versions / test_invalid_decision_fails_end_to_end
+边界 2 record_hash 缺失：test_record_hash_missing_in_detail_is_error / _in_log_is_error / test_missing_record_hash_fails_end_to_end
+边界 3 四套版本固定：test_missing_version_fails
+
+回归方式：python3 -m pytest tests/test_validate_rounds.py -q
+反向验证：把三处修复临时回退为旧行为后，新增用例 5 failed / 4 passed；恢复后 9 passed。
+全量：python3 -m pytest -q = 47 passed（原 38 + 新增 9）。
