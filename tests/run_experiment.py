@@ -196,10 +196,12 @@ def run_one(
 
 def write_raw_runs(rows: list[dict], output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
-    with output.open("w", encoding="utf-8", newline="") as f:
+    checkpoint = output.with_name(output.name + ".tmp")
+    with checkpoint.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=RAW_RUN_FIELDS)
         writer.writeheader()
         writer.writerows(rows)
+    checkpoint.replace(output)
 
 
 def summarize(rows: list[dict]) -> None:
@@ -309,6 +311,8 @@ def main() -> int:
                         document_path,
                     )
                 )
+                # Persist completed rows before another model call can fail or be interrupted.
+                write_raw_runs(rows, args.output)
 
     write_raw_runs(rows, args.output)
     print(
