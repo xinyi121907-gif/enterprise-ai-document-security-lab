@@ -136,16 +136,23 @@ model verification unavailable: <urlopen error [Errno 111] Connection refused>
 2. 旧核对内容（第一至六节）全部保留，作为「曾发现基准不一致」的过程证据，不删不改。
 3. 遗留待办：`--check-model` 需在有 Ollama 的机器复跑，结果应由该机器负责人记录。
 
-### 7.5 与 main 同名文件的冲突处理（本次提交说明）
+### 7.5 与 main 同名文件的冲突处理（2026-11-07 按 CXY 指示更新）
 
-`handoff/xrs/20261106_security_freeze/security_freeze_hash.txt` 在 main 上已被 CXY 于 11-06
-整体替换（0ca8d07 基准）。若本分支直接改写该文件，会与 main 冲突、阻塞 PR 合并。
-为让本 PR 可直接合并、不耽误 11-07/08 交付，本次采用如下处理：
+最初的规避做法：main 上 `security_freeze_hash.txt` 已被 CXY 于 11-06 整体替换
+（0ca8d07 基准），为避免冲突、保持 PR 可自动合并，曾把 rev.3 放到新文件
+`security_freeze_hash_rev3_aligned.txt`，原文件不动。
 
-- **原 `security_freeze_hash.txt` 保持 main 现有内容不变**（本 PR 未修改该文件）；
-- XRS 对齐版 rev.3（基准 `052d8da`）以同目录新文件
-  **`security_freeze_hash_rev3_aligned.txt`** 提交。
+**CXY 11-07 明确否定了这一处理**：「可以在你的分支更新 `security_freeze_hash.txt`，
+旧版另存历史文件；冲突正常解决，不需要为了保持自动合并而保留过时主记录。」
 
-请 CXY 核对 rev.3 内容与 `freeze_manifest.json` 一致后，**在 main 上用它替换**
-`security_freeze_hash.txt`，或授权 XRS 在后续 PR 中执行替换。这样 main 上不会同时存在
-两套基准描述。
+据此现行处理如下：
+
+| 项 | 处理 |
+|---|---|
+| `security_freeze_hash.txt` | **直接更新为对齐 `052d8da` 的 rev.3**（本分支覆盖 main 旧内容） |
+| 旧版（0ca8d07 统一记录，116 行） | 另存为 `security_freeze_hash_legacy_0ca8d07_integrated.txt`，作为历史记录保留，不再作为现行依据 |
+| `security_freeze_hash_rev3_aligned.txt` | 已删除，不再存在两套并行文件 |
+| 与 main 的冲突 | 按 CXY 指示正常解决，冲突解决后保留 rev.3 内容；不为保持自动合并而保留过时主记录 |
+
+> 过程说明：先前的「独立文件 + 不动同名文件」方案在 `f2ba65d` 中提交过，本节保留该记录
+> 作为过程证据；现行方案以本表为准。
