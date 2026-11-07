@@ -2,7 +2,7 @@
 
 核对时间：2026-11-07
 核对人：XRS
-核对对象：`handoff/xrs/20261106_security_freeze/security_freeze_hash.txt`（main 上已由 CXY 改写为「统一冻结记录 2026-11-06」，基准 commit `0ca8d07da31bd4162ba5ec51939df6b43dd304cc`）
+核对对象：`handoff/xrs/20261106_security_freeze/security_freeze_hash.txt`（main 上曾被 CXY 改写为「统一冻结记录 2026-11-06」，基准 commit `0ca8d07da31bd4162ba5ec51939df6b43dd304cc`）
 
 ## 一、为什么要做这次核对
 
@@ -85,3 +85,55 @@ da9719ce69e0adcdffe36a505aa4e662cc21fb5108d02748042cf1669a838133    4479  tests/
 main 上的统一冻结记录写的是 `0ca8d07`，但 main 实际代码是 `052d8da` 线
 （pipeline 11670B 而非 9001B、tools 1369B 而非 870B）。正式冻结与正式 120 次运行
 应该统一到哪一个？我这边可以先按 main 实测口径推进，等你确认后再调整。
+
+---
+
+## 七、新版基准确认后的核对结果（2026-11-07 追加）
+
+**CXY 答复：正式冻结代码基准统一采用 `052d8da15da3086b0d50c4f84249ec3da079a033`，
+不回退到 `0ca8d07`；以 `docs/freeze_record_20261106.md` 与
+`handoff/cxy/20261106_freeze/freeze_manifest.json` 为准。旧核对报告保留并补充新版结果。**
+
+### 7.1 权威依据已核实
+
+| 依据 | 关键字段 | 实测 |
+|---|---|---|
+| `docs/freeze_record_20261106.md` | 「本次冻结基于已合并的修复版本 `052d8da…`」；「本记录替代此前基于 0ca8d07 的整合冻结说明」 | 与答复一致 |
+| `freeze_manifest.json` | `source_commit = 052d8da15da3086b0d50c4f84249ec3da079a033`，`files` 共 **41** 项 | 与答复一致 |
+| `prompt_snapshot.json` | `prompt_snapshot_sha256 = e2dabe1c…` | 校验通过 |
+
+> 说明：main 上 `handoff/xrs/20261106_security_freeze/security_freeze_hash.txt` 当时仍残留
+> 0ca8d07 文本，属于尚未对齐的历史残留，**不是当前基准**。本报告第三节的 7 项「不符」，
+> 比对对象就是这段已被废弃的文本，不是针对 052d8da 基准的结论。
+
+### 7.2 CXY 要求的校验命令实测
+
+```
+$ python handoff/cxy/20261106_freeze/verify_freeze.py
+PASS: 41 files, prompt snapshot
+Source commit: 052d8da15da3086b0d50c4f84249ec3da079a033
+退出码 0
+
+$ python handoff/cxy/20261106_freeze/verify_freeze.py --check-model
+model verification unavailable: <urlopen error [Errno 111] Connection refused>
+退出码 1
+```
+
+- 41 项文件 + prompt 快照校验**全部通过**，source commit 与确认基准一致。
+- `--check-model` **本机未通过**：本机（云主机）无 Ollama、`localhost:11434` 无服务。
+  该项需在装有 qwen2.5:7b 的运行机器（YCQ / ZL 环境）执行，本报告不宣称该项已通过。
+
+### 7.3 XRS 负责的 11 项与 manifest 逐项比对
+
+11 项（src 7 + tests 3 + config.yaml）全部命中 manifest 对应条目，
+`sha256` 与字节数**11/11 一致，0 项不符**。完整数值见第五节，或直接以 manifest 为准。
+
+### 7.4 本次动作与边界
+
+1. 已将 `handoff/xrs/20261106_security_freeze/security_freeze_hash.txt` 重写为对齐
+   `052d8da` 的 **rev.3**，写明版本沿革（rev.1 作废 / rev.2 被替换 / rev.3 对齐）、
+   权威依据、11 项哈希、理由码、指标公式、config 契约与验证结果。
+2. **未修改、未回退任何代码**；工作区 `src/`、`tests/`、`config.yaml` 与
+   `052d8da`/main 保持原样（由 `verify_freeze.py` 41 项 PASS 佐证）。
+3. 旧核对内容（第一至六节）全部保留，作为「曾发现基准不一致」的过程证据。
+4. 遗留待办：`--check-model` 需在有 Ollama 的机器复跑，结果应由该机器负责人记录。
