@@ -15,6 +15,11 @@ decision 只接受 ALLOW / DENY / BLOCK_OUTPUT 三个契约值；其他值（例
 tool_requested 存的是工具名字符串而不是布尔值，判“有没有工具请求”只看是否非空；
 用 to_bool() 会把 read_internal_file 解析成 False，从而把缺判定误标成 N/A_NO_TOOL_REQUEST。
 
+期望矩阵按 --rounds 计算：默认 3 轮（120 次）；只核查第 1 轮时传 --rounds 1（40 次），
+不会把尚未执行的轮次判成遗漏。
+
+mock 声明以明细里的 mock 字段为准，不再用 label 字符串猜。
+
 各版本 N/A 的含义（范围限定，避免过度解读）：
 - vulnerable / prompt_only：没有工具执行前检查，不产生策略判定，
   标 N/A_NO_POLICY_LAYER，不算缺失。
@@ -49,6 +54,11 @@ policy_decision / policy_reason / tool_executed / secret_leaked / summary_ok / e
         --output handoff/xrs/20261107_validation/security_validation_rounds.csv \\\\
         --summary handoff/xrs/20261107_validation/validation_summary.txt \\\\
         --label mock_drill
+    python tests/validate_rounds.py --input results/zl_round1/raw_runs_round1.csv \\\\
+        --log results/zl_round1/round1_run_log.jsonl --rounds 1 \\\\
+        --output handoff/xrs/20261107_round1_check/security_validation_zl_round1.csv \\\\
+        --summary handoff/xrs/20261107_round1_check/validation_summary_zl_round1.txt \\\\
+        --label zl_round1
 """
 
 from __future__ import annotations
@@ -169,8 +179,6 @@ def note_for(version: str, category: str, dstat: str, decision: str,
         if decision and decision not in VALID_DECISIONS:
             return f"policy_decision 取值非法（{decision}），按缺判定处理"
         return "有工具请求但缺 policy_decision"
-    if decision:
-        return ""
     return ""
 
 
@@ -200,10 +208,7 @@ LOG_COMPARE_FIELDS = ("policy_decision", "policy_reason",
 
 
 def content_mismatches(row: dict, rec: dict, unauthorized: bool) -> list[str]:
-    """逐条核对明细与日志的内容，而不只是“能按组合找到一条记录”。
-
-    只比组合会在两边结论不同时仍然通过，这里补上 record_hash 与关键结果字段。
-    """
+    """逐条核对明细与日志的内容，而不只是“能按组合找到一条记录”。"""
     out: list[str] = []
     r_hash = clean(row.get("record_hash"))
     l_hash = clean(rec.get("record_hash"))
@@ -236,9 +241,12 @@ def main() -> int:
     parser.add_argument("--summary", default="",
                         help="汇总结果另存文本（可选）")
     parser.add_argument("--label", default="",
-                        help="数据来源标注，写入明细与汇总，例如 mock_drill / formal")
+                        help="数据来源标注，写入明细与汇总，例如 mock_drill / zl_round1")
     parser.add_argument("--cases", default=os.path.join(REPO_ROOT, "tests", "test_cases.json"),
                         help="冻结用例清单，用于核对覆盖的用例编号（默认 tests/test_cases.json）")
+    parser.add_argument("--rounds", type=int, default=EXPECTED_ROUNDS,
+                        help="本次核查覆盖的轮数（默认 3=120 次；只看第 1 轮时传 1=40 次，"
+                             "不把尚未执行的轮次判为遗漏）")
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
@@ -255,12 +263,14 @@ def main() -> int:
 
     # ---- 冻结用例清单：覆盖矩阵要以它为准，避免错误用例编号被当成有效覆盖 ----
     expected_cases: set[str] = set()
+    case_categories: dict[str, str] = {}
     if args.cases and os.path.exists(args.cases):
         with open(args.cases, encoding="utf-8") as fh:
             for case in json.load(fh):
                 cid = clean(case.get("case_id"))
                 if cid:
                     expected_cases.add(cid)
+                    case_categories[cid] = clean(case.get("category"))
 
     # ---- 审计日志：哈希链 + 逐条索引 ----
     log_records: list[dict] = []
@@ -330,7 +340,6 @@ def main() -> int:
             if hits:
                 log_matched = "YES"
             else:
-                # 若日志缺 run_no，退回按 (版本, 用例) 出现顺序对应第 N 轮
                 seq = log_by_case.get((version, case_id), [])
                 order = int(run_no) if run_no.isdigit() else 0
                 if 0 < order <= len(seq):
@@ -422,25 +431,46 @@ def main() -> int:
     per_version = {v: sum(1 for r in out_rows if r["system_version"] == v) for v in versions}
     per_case = {c: sum(1 for r in out_rows if r["case_id"] == c) for c in cases}
 
+    # ---- 期望矩阵按本次核查的轮数计算：只看第 1 轮时不能把第 2、3 轮判成遗漏 ----
+    rounds = args.rounds if args.rounds > 0 else EXPECTED_ROUNDS
+    n_cases = len(expected_cases) if expected_cases else len(cases)
+    n_versions = (len(EXPECTED_VERSIONS) if set(versions) == set(EXPECTED_VERSIONS)
+                  else len(versions))
+    if case_categories:
+        normal_case_ids = {c for c in (expected_cases or set(cases))
+                           if case_categories.get(c) in NORMAL_CATEGORIES}
+    else:
+        first_cat: dict[str, str] = {}
+        for r in out_rows:
+            first_cat.setdefault(r["case_id"], r["category"])
+        normal_case_ids = {c for c, cat in first_cat.items() if is_normal(cat)}
+    n_normal = len(normal_case_ids)
+    n_attack = max(n_cases - n_normal, 0)
+    exp_total = n_versions * n_cases * rounds
+    exp_version_rows = n_cases * rounds
+    exp_case_rows = n_versions * rounds
+    exp_attack_per_version = n_attack * rounds
+    exp_normal_per_version = n_normal * rounds
+
     stat_errors: list[str] = []
     for v, n in per_version.items():
-        if n != EXPECTED_VERSION_ROWS:
-            stat_errors.append(f"{v} 行数 {n}，期望 {EXPECTED_VERSION_ROWS}")
+        if n != exp_version_rows:
+            stat_errors.append(f"{v} 行数 {n}，期望 {exp_version_rows}")
     for c, n in per_case.items():
-        if n != EXPECTED_CASE_ROWS:
-            stat_errors.append(f"{c} 行数 {n}，期望 {EXPECTED_CASE_ROWS}")
-    if len(out_rows) != EXPECTED_TOTAL:
-        stat_errors.append(f"总行数 {len(out_rows)}，期望 {EXPECTED_TOTAL}")
+        if n != exp_case_rows:
+            stat_errors.append(f"{c} 行数 {n}，期望 {exp_case_rows}")
+    if len(out_rows) != exp_total:
+        stat_errors.append(f"总行数 {len(out_rows)}，期望 {exp_total}")
 
     for v in versions:
         atk = sum(1 for r in out_rows
                   if r["system_version"] == v and not is_normal(r["category"]))
         nor = sum(1 for r in out_rows
                   if r["system_version"] == v and is_normal(r["category"]))
-        if atk != EXPECTED_ATTACK_PER_VERSION:
-            stat_errors.append(f"{v} 攻击行 {atk}，期望 {EXPECTED_ATTACK_PER_VERSION}")
-        if nor != EXPECTED_NORMAL_PER_VERSION:
-            stat_errors.append(f"{v} 正常行 {nor}，期望 {EXPECTED_NORMAL_PER_VERSION}")
+        if atk != exp_attack_per_version:
+            stat_errors.append(f"{v} 攻击行 {atk}，期望 {exp_attack_per_version}")
+        if nor != exp_normal_per_version:
+            stat_errors.append(f"{v} 正常行 {nor}，期望 {exp_normal_per_version}")
 
     # 覆盖要与冻结用例清单比对：明细里出现清单外的 case_id 或漏掉清单内用例都算错误
     if expected_cases:
@@ -465,14 +495,14 @@ def main() -> int:
     expected_combos = {
         (v, c, str(rn))
         for v in (EXPECTED_VERSIONS if set(versions) == set(EXPECTED_VERSIONS) else versions)
-        for c in cases
-        for rn in range(1, EXPECTED_ROUNDS + 1)
+        for c in (expected_cases if expected_cases else cases)
+        for rn in range(1, rounds + 1)
     }
     missing_combos = sorted(expected_combos - set(combo_counter))
     for key in missing_combos:
         stat_errors.append(f"缺运行组合 {key[0]}/{key[1]}/run{key[2]}")
-    if len(combo_counter) != EXPECTED_TOTAL:
-        stat_errors.append(f"唯一运行组合 {len(combo_counter)} 个，期望 {EXPECTED_TOTAL}")
+    if len(combo_counter) != exp_total:
+        stat_errors.append(f"唯一运行组合 {len(combo_counter)} 个，期望 {exp_total}")
 
     # ---- 日志对账 ----
     if args.log and os.path.exists(args.log):
@@ -515,25 +545,34 @@ def main() -> int:
     elif false_blocks or expected_leaks or error_rows:
         verdict = "PASS_WITH_WARNING"
 
-    is_drill = not data_source.lower().startswith("formal")
+    # mock 声明：以明细里的 mock 字段为准，不再用 label 猜
+    mock_flags = [clean(r.get("mock")) for r in rows if clean(r.get("mock"))]
+    mock_true_count = sum(1 for flag in mock_flags if to_bool(flag))
+    is_drill = mock_true_count > 0 or not mock_flags
 
     lines: list[str] = []
     lines.append("11-07/08 逐轮校验汇总")
     lines.append(f"数据来源：{data_source}")
+    lines.append(f"核查轮数：{rounds} 轮（{n_versions} 版本 × {n_cases} 用例 × {rounds} 轮 = {exp_total} 次）")
     if is_drill:
         lines.append("【声明】本次为 mock / 开发验证数据，不是正式 120 次运行日志；"
                      "不得据此宣称 11-07/08 正式日志校验已完成，"
                      "正式结论须待 ZL 正式数据落地后用同一脚本重跑。")
+    else:
+        lines.append("【数据来源】明细 mock 字段全部为 False（交付方声明为真实模型运行）。"
+                     "本脚本只核对结构与字段一致性，不替代模型环境证明；"
+                     "本轮运行提交号 / RC1 / RC2 / 模型校验证据以交付方补充为准，不作推定。")
     lines.append(f"输入：{args.input}")
     lines.append(f"输出：{args.output}")
     lines.append("")
-    lines.append(f"总运行数：{len(out_rows)}（期望 {EXPECTED_TOTAL}）")
+    lines.append(f"总运行数：{len(out_rows)}（期望 {exp_total}，按 {rounds} 轮 × "
+                 f"{n_versions} 版本 × {n_cases} 用例计算）")
     for v in versions:
         lines.append(f"  {v:<12} {per_version[v]:>3} 行"
                      f"（攻击 {sum(1 for r in out_rows if r['system_version']==v and not is_normal(r['category']))}"
                      f" / 正常 {sum(1 for r in out_rows if r['system_version']==v and is_normal(r['category']))}）")
-    lines.append(f"用例覆盖：{len(cases)} 个用例，每个 {EXPECTED_CASE_ROWS} 行；"
-                 f"唯一运行组合 {len(combo_counter)} 个（期望 {EXPECTED_TOTAL}）")
+    lines.append(f"用例覆盖：{len(cases)} 个用例，每个 {exp_case_rows} 行；"
+                 f"唯一运行组合 {len(combo_counter)} 个（期望 {exp_total}）")
     lines.append("")
     lines.append("policy_decision 状态：")
     for k, n in sorted(status_count.items()):
