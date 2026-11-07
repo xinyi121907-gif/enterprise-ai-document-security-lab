@@ -11,12 +11,14 @@
 
 decision 只接受 ALLOW / DENY / BLOCK_OUTPUT 三个契约值；其他值（例如 BANANA）
 视为无效判定并按 MISSING 处理，不能因为“字段非空”就判 OK。
+非策略版本（vulnerable / prompt_only）里出现非法值同样判错，不能被 N/A_NO_POLICY_LAYER 掩盖。
 
 tool_requested 存的是工具名字符串而不是布尔值，判“有没有工具请求”只看是否非空；
 用 to_bool() 会把 read_internal_file 解析成 False，从而把缺判定误标成 N/A_NO_TOOL_REQUEST。
 
 期望矩阵按 --rounds 计算：默认 3 轮（120 次）；只核查第 1 轮时传 --rounds 1（40 次），
-不会把尚未执行的轮次判成遗漏。
+不会把尚未执行的轮次判成遗漏。版本维度固定为四套（vulnerable / prompt_only / keyword / protected），
+输入里少交一个版本会直接记统计错误，不随输入缩减期望。
 
 mock 声明以明细里的 mock 字段为准，不再用 label 字符串猜。
 
@@ -45,20 +47,20 @@ normalized_path 与当前上传文件比较，能覆盖“用 read_uploaded_file
 
 日志对账除哈希链与按组合匹配外，还逐条核对 record_hash 与
 policy_decision / policy_reason / tool_executed / secret_leaked / summary_ok / error 等字段，
-两边结论不同会判 CONTENT_MISMATCH 并计入统计错误，不会因为“能找到对应记录”就通过。
+两边结论不同会判 CONTENT_MISMATCH 并计入统计错误；明细或日志任一侧 record_hash 缺失
+同样判错，不会因为“能找到对应记录”就通过。
 
 用法：
     python tests/validate_rounds.py --input results/raw_runs.csv
-    python tests/validate_rounds.py --input results/raw_runs.csv \\\\
-        --log artifacts/logs/run_log.jsonl \\\\
-        --output handoff/xrs/20261107_validation/security_validation_rounds.csv \\\\
-        --summary handoff/xrs/20261107_validation/validation_summary.txt \\\\
-        --label mock_drill
-    python tests/validate_rounds.py --input results/zl_round1/raw_runs_round1.csv \\\\
-        --log results/zl_round1/round1_run_log.jsonl --rounds 1 \\\\
-        --output handoff/xrs/20261107_round1_check/security_validation_zl_round1.csv \\\\
-        --summary handoff/xrs/20261107_round1_check/validation_summary_zl_round1.txt \\\\
-        --label zl_round1
+    python tests/validate_rounds.py --input results/raw_runs.csv --log artifacts/logs/run_log.jsonl
+        --output handoff/xrs/20261107_validation/security_validation_rounds.csv
+        --summary handoff/xrs/20261107_validation/validation_summary.txt --label mock_drill
+    python tests/validate_rounds.py --input results/zl_round1/raw_runs_round1.csv
+        --log results/zl_round1/round1_run_log.jsonl --rounds 1
+        --output handoff/xrs/20261107_round1_check/security_validation_zl_round1.csv
+        --summary handoff/xrs/20261107_round1_check/validation_summary_zl_round1.txt --label zl_round1
+
+回归测试：tests/test_validate_rounds.py（非法 decision / record_hash 缺失 / 四套版本固定）。
 """
 
 from __future__ import annotations
@@ -141,6 +143,10 @@ def has_tool_request(value) -> bool:
 
 def decision_status(version: str, decision: str, tool_requested: str) -> str:
     """decision 只接受 ALLOW / DENY / BLOCK_OUTPUT，其余值一律视为无效判定。"""
+    # 非法取值本身就是数据错误，必须先于版本/触发状态判断，
+    # 否则无策略层的版本会把 BANANA 这类错误值掩盖成 N/A。
+    if decision and decision not in VALID_DECISIONS:
+        return STATUS_MISSING
     if version not in POLICY_VERSIONS:
         return N_A_NO_POLICY_LAYER
     if decision in VALID_DECISIONS:
@@ -212,7 +218,11 @@ def content_mismatches(row: dict, rec: dict, unauthorized: bool) -> list[str]:
     out: list[str] = []
     r_hash = clean(row.get("record_hash"))
     l_hash = clean(rec.get("record_hash"))
-    if r_hash and l_hash and r_hash != l_hash:
+    if not r_hash:
+        out.append("record_hash 缺失（明细行没有哈希，无法与日志建立对应）")
+    elif not l_hash:
+        out.append("record_hash 缺失（日志记录没有哈希）")
+    elif r_hash != l_hash:
         out.append("record_hash 不一致")
     for field in LOG_COMPARE_FIELDS:
         rv = clean(row.get(field)).lower()
@@ -434,8 +444,8 @@ def main() -> int:
     # ---- 期望矩阵按本次核查的轮数计算：只看第 1 轮时不能把第 2、3 轮判成遗漏 ----
     rounds = args.rounds if args.rounds > 0 else EXPECTED_ROUNDS
     n_cases = len(expected_cases) if expected_cases else len(cases)
-    n_versions = (len(EXPECTED_VERSIONS) if set(versions) == set(EXPECTED_VERSIONS)
-                  else len(versions))
+    # 版本维度固定为四套：输入里少一个版本不能被当成“期望也缩小了”，否则漏跑整套版本不会被发现。
+    n_versions = len(EXPECTED_VERSIONS)
     if case_categories:
         normal_case_ids = {c for c in (expected_cases or set(cases))
                            if case_categories.get(c) in NORMAL_CATEGORIES}
@@ -453,6 +463,12 @@ def main() -> int:
     exp_normal_per_version = n_normal * rounds
 
     stat_errors: list[str] = []
+    absent_versions = [v for v in EXPECTED_VERSIONS if v not in per_version]
+    extra_versions = [v for v in per_version if v not in EXPECTED_VERSIONS]
+    for v in absent_versions:
+        stat_errors.append(f"缺少版本 {v}（四套版本必须都在，不能按输入出现数缩减）")
+    for v in extra_versions:
+        stat_errors.append(f"未知版本 {v}，不在四套固定版本内")
     for v, n in per_version.items():
         if n != exp_version_rows:
             stat_errors.append(f"{v} 行数 {n}，期望 {exp_version_rows}")
@@ -462,7 +478,7 @@ def main() -> int:
     if len(out_rows) != exp_total:
         stat_errors.append(f"总行数 {len(out_rows)}，期望 {exp_total}")
 
-    for v in versions:
+    for v in EXPECTED_VERSIONS:
         atk = sum(1 for r in out_rows
                   if r["system_version"] == v and not is_normal(r["category"]))
         nor = sum(1 for r in out_rows
@@ -494,7 +510,7 @@ def main() -> int:
 
     expected_combos = {
         (v, c, str(rn))
-        for v in (EXPECTED_VERSIONS if set(versions) == set(EXPECTED_VERSIONS) else versions)
+        for v in EXPECTED_VERSIONS
         for c in (expected_cases if expected_cases else cases)
         for rn in range(1, rounds + 1)
     }
@@ -567,8 +583,8 @@ def main() -> int:
     lines.append("")
     lines.append(f"总运行数：{len(out_rows)}（期望 {exp_total}，按 {rounds} 轮 × "
                  f"{n_versions} 版本 × {n_cases} 用例计算）")
-    for v in versions:
-        lines.append(f"  {v:<12} {per_version[v]:>3} 行"
+    for v in EXPECTED_VERSIONS:
+        lines.append(f"  {v:<12} {per_version.get(v, 0):>3} 行"
                      f"（攻击 {sum(1 for r in out_rows if r['system_version']==v and not is_normal(r['category']))}"
                      f" / 正常 {sum(1 for r in out_rows if r['system_version']==v and is_normal(r['category']))}）")
     lines.append(f"用例覆盖：{len(cases)} 个用例，每个 {exp_case_rows} 行；"
