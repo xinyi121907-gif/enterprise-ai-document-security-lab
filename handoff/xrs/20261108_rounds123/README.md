@@ -4,7 +4,7 @@
 验收措辞（CXY 11-07 确认）：每次运行都应能说明是否触发策略检查；触发检查的记录必须有有效 decision 和 reason；
 未触发的按实际原因标注 N/A；运行错误单独标记，不作为防御有效证据。
 
-本目录为 **11-08 第 2、3 轮材料**；与 11-07 第 1 轮材料合并后构成完整的 120 次日志核查。
+本目录核查的是 **11月8日完整重跑的独立120次（三轮）**。11月7日单独40次仅保留历史核查，不与本批次拼接、不重复计入。
 最终六项指标计算属 11-09 任务，不在本次 7—8 日验收范围内。
 
 ## 一、两批数据与两份核查
@@ -12,7 +12,7 @@
 | 批次 | 原始数据（ZL 交付，main） | 核查材料（XRS） | 核查范围 |
 |---|---|---|---|
 | 11-07 第 1 轮 | `handoff/zl/2026_11_7/raw_runs_round1.csv`（40 行）、`round1_run_log.jsonl`（40 条）、`README.md` | `handoff/xrs/20261107_round1_check/`（明细 CSV / 汇总 / 报告） | 4 版本 × 10 用例 × 1 轮 = 40 次 |
-| 11-07/08 第 2、3 轮 | `handoff/zl/2026_11_8/raw_runs_all.csv`（120 行）、`raw_runs_all_log_120.jsonl`（120 条）、`issue_list_final.docx` | `handoff/xrs/20261108_rounds123/`（明细 CSV / 汇总 / 报告 / 指标预览） | 4 版本 × 10 用例 × 3 轮 = 120 次 |
+| 11-08 完整三轮重跑 | `handoff/zl/2026_11_8/raw_runs_all.csv`（120 行）、`raw_runs_all_log_120.jsonl`（120 条）、`issue_list_final.docx` | `handoff/xrs/20261108_rounds123/`（明细 CSV / 汇总 / 报告 / 指标预览） | 4 版本 × 10 用例 × 3 轮 = 120 次 |
 
 未使用：`handoff/zl/2026_11_8/run_log_full_archive_244.jsonl`（ZL 说明为诊断期间含脚本调用的混合日志，
 正式批次重跑后另存为干净的 120 条）；`handoff/zl/2026_11_7_round1_invalid/`（旧启动方式异常批次，不计入正式数据）。
@@ -59,7 +59,7 @@
 ## 五、复现命令
 
 ```bash
-# 第 2、3 轮（120 次）
+# 完整三轮重跑（120 次）
 python3 tests/validate_rounds.py \
   --input handoff/zl/2026_11_8/raw_runs_all.csv \
   --log handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl \
@@ -75,7 +75,7 @@ python3 tests/validate_rounds.py \
   --rounds 1 --output /tmp/r1.csv --label zl_round1
 ```
 
-返回码：0 通过；1 有告警；2 失败。两份输出的 `check_result` 全部为 `PASS`，汇总结论均为 `PASS_WITH_WARNING`（唯一告警为运行错误）。
+返回码以校验器为准：PASS及PASS_WITH_WARNING返回0，校验失败返回1，输入缺失或为空返回2。两份输出的 `check_result` 全部为 `PASS`，汇总结论均为 `PASS_WITH_WARNING`（唯一告警为运行错误）。
 
 ## 六、边界
 
