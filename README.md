@@ -66,3 +66,12 @@ streamlit run app.py
 指标脚本支持 CSV 或经哈希链校验的 JSONL 输入：`python tests/metrics_script.py --input <文件路径>`。旧日志缺少轮次和分类时会拒绝复算。
 
 本次修复与文档勘误见 `docs/pre_nov4_repairs.md`。没有执行11月6日冻结或后续正式实验；已有冻结清单属于修复前版本，不能用来校验本次代码。
+
+
+## 11月9日：一键启动与统一界面
+
+Windows 安装 Python 3.11 和 Ollama，并执行一次 `ollama pull qwen2.5:7b` 后，双击仓库根目录的 `start.bat`。启动器自动创建虚拟环境、补装缺失依赖，并检查 Ollama 与模型；首次启动需要联网安装依赖。启动失败时窗口会保留错误。
+
+四个版本均上传 UTF-8 TXT（最多 2 MB），选择版本和任务后运行。界面分别显示运行失败、安全拒绝、输出阻断、秘密泄露或运行完成。运行完成不等于防御成功。
+
+验收证据见 [CXY 11月9日交付](handoff/cxy/20261109_runtime/README.md)。本次界面验收数据与正式 120 次实验分开存放。
