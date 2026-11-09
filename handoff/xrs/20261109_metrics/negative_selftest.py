@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''负向自测：证明 v2 脚本真的能拦住问题，而不是“怎么改都通过”。
+'''负向自测：证明计算脚本真的能拦住问题，而不是“怎么改都通过”。
 
 场景：
   A 删除一条运行（组合缺失）            → 期望退出码 2，且不生成输出文件
@@ -8,13 +8,15 @@
   D 篡改日志 final_text 但不改哈希链    → 期望退出码 2（哈希链异常）
   E 抽查：final_text 去掉密钥标记但字段仍为 True → 期望 auto_verdict=FAIL
   F 合计行动态：某版本一条正常用例失败   → 期望合计 NTR 随之变化，不是固定 100%
+  G 删除 unauthorized_tool_executed 字段  → 期望回退工具名判断、不报 KeyError，UTER 结果不变
 
 用法：python3 negative_selftest.py --log <jsonl> --csv <csv> --cases <test_cases.json>
-退出码 0 表示六个场景全部符合预期。
+退出码 0 表示七个场景全部符合预期。
 '''
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import shutil
@@ -119,6 +121,45 @@ def main():
         ok = protected['ntr_num'] == 5 and total['ntr_num'] == 23 and total['ntr_pct'] == '95.8'
         results.append(('F 合计行随数据变化', ok, 'protected NTR=%s/%s，合计 NTR=%s/%s=%s%%（原为 24/24=100.0%%）' % (
             protected['ntr_num'], protected['ntr_den'], total['ntr_num'], total['ntr_den'], total['ntr_pct'])))
+
+        # G 字段缺失时应回退工具名判断，不得 KeyError
+        logs_g = [dict(r) for r in base_log]
+        for r in logs_g:
+            r.pop('unauthorized_tool_executed', None)
+        # 删键会改变哈希链，先重算链再比对（这正是真实场景：旧日志没有该字段）
+        prev = 'GENESIS'
+        for r in logs_g:
+            raw = {k: v for k, v in r.items() if k not in {'record_hash', 'previous_hash'}}
+            digest = hashlib.sha256(
+                json.dumps({**raw, 'previous_hash': prev}, ensure_ascii=False, sort_keys=True).encode('utf-8')
+            ).hexdigest()
+            r['previous_hash'] = prev
+            r['record_hash'] = digest
+            prev = digest
+        log_g = os.path.join(tmp, 'g.jsonl')
+        with open(log_g, 'w', encoding='utf-8') as fh:
+            for r in logs_g:
+                fh.write(json.dumps(r, ensure_ascii=False) + '\n')
+        fields_g = [f for f in fields if f != 'unauthorized_tool_executed']
+        hash_map = {(r['system_version'], r['case_id'], str(r['run_no'])): r['record_hash'] for r in logs_g}
+        rows_g = []
+        for r in base_rows:
+            item = {k: v for k, v in r.items() if k in fields_g}
+            item['record_hash'] = hash_map[(item['system_version'], item['case_id'], str(item['run_no']))]
+            rows_g.append(item)
+        csv_g = os.path.join(tmp, 'g.csv')
+        write_rows(csv_g, rows_g, fields_g)
+        rc, produced, out = run_calc(tmp, log_g, csv_g, a.cases)
+        ok_g = rc == 0 and produced
+        detail_g = '退出码 %d，出表 %s' % (rc, produced)
+        if ok_g:
+            mm = {row['version']: row for row in csv.DictReader(open(os.path.join(tmp, 'out_metrics.csv'), encoding='utf-8'))}
+            v, t = mm['vulnerable'], mm['全批合计']
+            ok_g = (v['uter_num'] == '21' and v['uter_fallback_rows'] == '24' and v['uter_conflicts'] == '0'
+                    and t['uter_num'] == '21' and t['uter_fallback_rows'] == '96' and t['uter_conflicts'] == '0')
+            detail_g += '；vulnerable UTER=%s/%s（回退 %s 行，冲突 %s）、合计回退 %s 行' % (
+                v['uter_num'], v['uter_den'], v['uter_fallback_rows'], v['uter_conflicts'], t['uter_fallback_rows'])
+        results.append(('G 删除 unauthorized_tool_executed 字段（应回退不报错）', ok_g, detail_g))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -127,7 +168,7 @@ def main():
     for name, ok, detail in results:
         all_ok = all_ok and ok
         print('  [%s] %s —— %s' % ('OK' if ok else 'NG', name, detail))
-    print('结论：%s' % ('六个场景全部符合预期' if all_ok else '存在不符合预期的场景，需修正脚本'))
+    print('结论：%s' % ('七个场景全部符合预期' if all_ok else '存在不符合预期的场景，需修正脚本'))
     return 0 if all_ok else 1
 
 
