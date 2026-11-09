@@ -47,22 +47,8 @@ with st.sidebar:
 
     st.info(VERSION_LABELS[system_version])
 
-if system_version == "protected":
-    st.info(
-        "安全防护模式只读取本次通过界面上传的 TXT 文件；"
-        "不能手填仓库中的其他文件路径。"
-    )
-    uploaded_file = st.file_uploader(
-        "上传本次审阅的文档",
-        type=["txt"],
-    )
-    case_file = None
-else:
-    uploaded_file = None
-    case_file = st.text_input(
-        "测试文件路径（相对于项目根目录）",
-        "data/normal/resume_normal.txt",
-    )
+st.info("四个版本均使用当前上传的 TXT 文件，便于保持输入一致。")
+uploaded_file = st.file_uploader("上传本次审阅的文档", type=["txt"])
 
 user_query = st.text_area(
     "用户任务",
@@ -75,64 +61,50 @@ if st.button(
     type="primary",
     use_container_width=True,
 ):
-    if system_version == "protected":
-        if uploaded_file is None:
-            st.error("请先上传本次要审阅的 TXT 文件。")
+    if uploaded_file is None:
+        st.error("请先上传本次要审阅的 TXT 文件。")
+        st.stop()
+    try:
+        file_bytes = uploaded_file.getvalue()
+        if not file_bytes or not file_bytes.strip():
+            st.error("文档为空，请选择有内容的 TXT 文件。")
             st.stop()
-
-        try:
-            file_bytes = uploaded_file.getvalue()
-
-            if len(file_bytes) > MAX_UPLOAD_BYTES:
-                st.error("文件超过 2 MB，请选择更小的 TXT 文件。")
-                st.stop()
-
-            try:
-                file_bytes.decode("utf-8")
-            except UnicodeDecodeError:
-                st.error("文件不是 UTF-8 编码的文本，请转换后再上传。")
-                st.stop()
-
-            # 文件名由服务器生成，不使用上传文件自带的名称作为路径。
-            UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
-            path = UPLOAD_ROOT / f"{uuid4().hex}.txt"
-            with path.open("xb") as output_file:
-                output_file.write(file_bytes)
-
-        except OSError as exc:
-            st.error(f"保存上传文件失败：{exc}")
+        if len(file_bytes) > MAX_UPLOAD_BYTES:
+            st.error("文件超过 2 MB，请选择更小的 TXT 文件。")
             st.stop()
-
-    else:
-        if not case_file or not case_file.strip():
-            st.error("请填写测试文件路径。")
-            st.stop()
-
-        # 相对路径固定以项目根目录为基准，与终端所在目录无关。
-        path = Path(case_file)
-        if not path.is_absolute():
-            path = PROJECT_ROOT / path
-        path = path.resolve()
-
-        if not path.is_file():
-            st.error(f"文件不存在：{case_file}")
-            st.stop()
+        file_bytes.decode("utf-8")
+        UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+        path = UPLOAD_ROOT / f"{uuid4().hex}.txt"
+        with path.open("xb") as output_file:
+            output_file.write(file_bytes)
+    except UnicodeDecodeError:
+        st.error("文件不是 UTF-8 编码，请转换后重试。")
+        st.stop()
+    except OSError as exc:
+        st.error(f"无法保存上传文件，请检查目录权限或磁盘空间：{exc}")
+        st.stop()
 
     with st.spinner("正在运行本地安全实验……"):
-        result = run_document_review(
-            case_id="MANUAL-01",
-            system_version=system_version,
-            document_path=str(path),
-            user_query=user_query,
-            business_type=business_type,
-        )
+        try:
+            result = run_document_review(
+                case_id="MANUAL-01",
+                system_version=system_version,
+                document_path=str(path),
+                user_query=user_query,
+                business_type=business_type,
+            )
+        except Exception as exc:
+            st.error(f"运行未完成，可能无法写入审计日志。请保留错误信息并检查磁盘和目录权限：{exc}")
+            st.stop()
 
     if result.error:
-        st.error("运行失败，请查看右侧错误信息。")
+        st.error("运行失败：请检查 Ollama 服务、模型是否安装及文件访问权限；详细原因见下方。")
     elif result.policy_decision == "DENY":
-        st.warning("策略门拒绝了本次文件读取。")
+        st.warning("本次操作被安全检查拒绝，具体原因见策略原因。")
     elif result.policy_decision == "BLOCK_OUTPUT":
         st.warning("输出防护阻止了本次结果展示。")
+    elif result.secret_leaked:
+        st.error("实验结果：输出包含虚构秘密标记，请勿当作安全审阅成功。")
     else:
         st.success(
             f"运行完成：{VERSION_LABELS[system_version]}"
