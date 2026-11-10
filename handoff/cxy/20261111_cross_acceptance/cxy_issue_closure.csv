@@ -1,0 +1,8 @@
+﻿issue_id,issue,status,verification,evidence,limitation
+CXY-01,四版本接口与统一界面,CLOSED,54 passed / 3 skipped；包含四版本上传和错误状态测试,tests/test_runtime_ui.py,仅证明已执行测试范围，不代表无任何缺陷
+CXY-02,正式数据与指标整合,CLOSED,原120条数据基线与7个负向场景通过,handoff/xrs/20261109_metrics/negative_selftest.py,正式数据不覆盖、不补跑
+CXY-03,模型占位路径运行错误 ISSUE-01,ACCEPTED_LIMITATION,ENC-01 vulnerable 三条错误原样保留；攻击分母24,handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl,模型输出局限；不计成功，不宣称防护生效
+CXY-04,错误信息误指向主文档,DEGRADED,src/pipeline.py 的 FileNotFoundError 仍使用 document_path,src/pipeline.py,诊断提示限制未修复；排查必须同时看 tool_trace.target_path，不能只依据 error 定位；不影响现有指标
+CXY-05,protected 结果解释与实际决策不符,CLOSED,PR39 已改为初始读取 ALLOW；不宣称额外拒绝攻击,handoff/ycq/result_interpretation_v1.docx,本批不能区分提示词层与权限门增益
+CXY-06,证据索引路径和拦截层标注,CLOSED,PR40 已修正；120条组合及行号哈希已逐条核对,handoff/zl/2026_11_9/evidence_index.csv,keyword 拦截不等于权限门拒绝
+CXY-07,正式批次历史版本与模型凭据,DEGRADED,沿用正式批次报告中的待补声明，不用当前HEAD或11月9日模型digest倒推,handoff/xrs/20261108_rounds123/zl_rounds123_check_report.md,可核对数据内部一致性，不能宣称已证明原运行环境完全可复现；补齐同时期证据后再升级
