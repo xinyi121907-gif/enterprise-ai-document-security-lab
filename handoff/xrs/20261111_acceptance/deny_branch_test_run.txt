@@ -1,0 +1,11 @@
+============================= test session starts ========================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: <validation-worktree>
+plugins: Faker-40.44.0, anyio-4.15.1, libtmux-0.62.0
+collected 21 items
+
+tests/test_policy_gate.py ..............                                 [ 66%]
+tests/test_protected_pipeline.py .                                       [ 71%]
+tests/test_integration_protected.py ......                               [100%]
+
+============================== 21 passed in 7.23s ==============================
