@@ -12,7 +12,7 @@
 
 `defense_implementation.docx` 为 v1.2，7 000 字左右，7 节 + 2 个附录，含 6 张表。
 
-SHA-256：`85f5b151302b4fe14a361b7bba05e47fbf073f451f17d027798c56ecc31b3fbc`（56 112 B）。
+SHA-256：`8952700159360d5910599e8b012cdee6c5fa3e98cd8fc9f36d8f97a30073842f`（56 170 B）。
 用 `git hash-object handoff/xrs/20261110_defense/defense_implementation.docx` 核对时，应得到 `05f87b7b82bf17607bf95eb61056ad296feda49a`。
 
 ## 修订记录
@@ -102,3 +102,7 @@ python3 handoff/xrs/20261109_metrics/negative_selftest.py \
 ## 已知问题
 
 - 本机无 git push 凭据，`.docx` 二进制无法通过仓库接口提交，需在 GitHub 网页上传；上传时请确认文件名不带 `(1)` 之类后缀。
+
+## 合并前核对补充
+
+已按正式日志修正第4.2节：keyword的24条攻击记录tool_trace均为空。第3.5节明确独立可信保存末条哈希与总条数属于建议，未宣称已实施。指标及原始数据未改。
