@@ -13,8 +13,8 @@
 | 文件 | 大小 | 说明 |
 |---|---|---|
 | `XRS验收签字表.docx` | 44 936 B | 八节 + 附录，含表 1 四类拒绝情形、表 2 正式 120 次判定统计、表 3 测试清单、表 4 签字栏、表 A.1 文件索引 |
-| `deny_branch_test_run.txt` | 602 B | `pytest -v` 完整输出，21 passed |
-| `test_run_log.jsonl` | 999 B | 测试过程产生的 1 条日志，`DENY` + `tool_executed=false` + trace 内 decision |
+| `deny_branch_test_run.txt` | 562 B | `pytest -v` 完整输出，21 passed |
+| `test_run_log.jsonl` | 1 027 B | 测试过程产生的 1 条日志，`DENY` + `tool_executed=false` + trace 内 decision |
 
 `XRS验收签字表.docx` SHA-256：`062e5f7e07c3fc68e9143c17e6af44c25e930f2e7739a2252e7ea4a6af514561`。
 `git hash-object handoff/xrs/20261111_acceptance/XRS验收签字表.docx` 应得到 `02f10d83a2f88edc891cc414fde7f367e8a95807`。
@@ -62,7 +62,7 @@ vulnerable 与 prompt_only 不调用 `authorize_tool`（`src/tools.py` 28–35�
 
 ## 日志隔离
 
-拒绝分支测试在固定提交的独立工作目录中执行，执行前清空该目录日志；产生的 1 条写入单独保存为 `test_run_log.jsonl`（已脉络化本地路径），**未**写入正式批次 `artifacts/logs/run_log.jsonl`。正式数据取自 `handoff/zl/2026_11_8/raw_runs_all.csv` 与 `raw_runs_all_log_120.jsonl`，`mock` 全为 False。
+拒绝分支测试在固定提交的独立工作目录中执行，执行前清空该目录日志；产生的 1 条写入单独保存为 `test_run_log.jsonl`，文件内的本地绝对路径已脱敏（统一替换为 `<validation-worktree>`），**未**写入正式批次 `artifacts/logs/run_log.jsonl`。正式数据取自 `handoff/zl/2026_11_8/raw_runs_all.csv` 与 `raw_runs_all_log_120.jsonl`，`mock` 全为 False。
 
 ## 复现命令
 
@@ -75,3 +75,4 @@ python3 -m pytest -q --ignore=tests/test_runtime_ui.py
 
 - 本机无 git push 凭据，`.docx` 二进制需在 GitHub 网页上传，上传时确认文件名不带 `(1)` 后缀。
 - 全量回归中未包含 `tests/test_runtime_ui.py`，该用例依赖 streamlit，与权限门无关。
+- 本分支落后 `main` 41 个提交且无独有提交，合并时以 `main` 的 11-10 目录内容（56 170 B 版）为准，本目录为新增文件不与其冲突。
