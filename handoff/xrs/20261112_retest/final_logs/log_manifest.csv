@@ -1,0 +1,2 @@
+file,records,bytes,sha256,first_previous_hash,last_record_hash,chain_verified,unique_combos,source_path
+run_log_final_120.jsonl,120,193223,f25f934f1cc6dcbfd73f57783e02e37ab0cfdb8f1a31fad2cfe6ecdf767a48b0,GENESIS,fee0d5e741adef32d73082f4babd17bb1a639622ae4a97e083a0f50b94ee897b,PASS,120,handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl

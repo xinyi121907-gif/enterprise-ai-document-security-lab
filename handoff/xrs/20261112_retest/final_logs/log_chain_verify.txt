@@ -1,0 +1,7 @@
+日志文件: handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl
+记录条数: 120
+首条 previous_hash: GENESIS
+末条 record_hash: fee0d5e741adef32d73082f4babd17bb1a639622ae4a97e083a0f50b94ee897b
+verify_log_chain: PASS
+末条哈希独立复算: MATCH
+组合完整性: 120 个唯一组合
