@@ -1,9 +1,16 @@
+# 11-12 界面测试复跑（按 requirements.txt 固定依赖）
+执行时间：2026-11-12
+环境：Python 3.12.11 / streamlit 1.39.0 / pytest 8.4.2
+依赖来源：requirements.txt 固定 streamlit==1.39.0
+工作目录：基准提交 bc786f3 的隔离副本（仓库根，未做任何临时链接）
+命令：python3 -m pytest -q tests/test_runtime_ui.py -v
+
 ============================= test session starts ==============================
 platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0
-rootdir: /home/user/Doubao/chats/38449132019409154/xrs_1112/work
+rootdir: <基准提交 bc786f3 的隔离工作副本根>
 plugins: Faker-40.44.0, anyio-4.15.1, libtmux-0.62.0
 collected 9 items
 
 tests/test_runtime_ui.py .........                                       [100%]
 
-============================== 9 passed in 11.37s ==============================
+============================== 9 passed in 8.08s ===============================
