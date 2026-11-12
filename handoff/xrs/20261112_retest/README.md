@@ -10,6 +10,10 @@
 
 本次复测只做三件事：重新执行、与旧交付逐字段比对、如实记录差异。所有数字都是从 11 月 8 日 ZL 正式交付的 120 条原始日志重新算出来的，没有复制旧表、没有手工改数。11 月 12 日起禁止新增功能，因此本次没有改动任何 `src/` 代码。
 
+## 测试环境
+
+按 `requirements.txt` 的固定依赖执行：Python 3.12.11 / streamlit 1.39.0 / pytest 8.4.2。界面测试不需要任何临时链接或额外配置，在仓库根目录直接运行即可。
+
 ## 复测清单（见 security_retest.csv，9 项）
 
 | 编号 | 对象 | 结论 | 关键比对 |
@@ -21,8 +25,8 @@
 | R-05 | `tests/` 非界面测试 | PASS | 53 passed（11-11 为 48，新增 5 项端到端拒绝） |
 | R-06 | protected 端到端拒绝测试 | PASS | 11 月 12 日重新执行，5 passed |
 | R-07 | 41 项冻结完整性 | PASS_WITH_NOTE | 39 项匹配；2 项不符（11-07 checkpoint 与 11-09 启动器），不回退 |
-| R-08 | `tests/run_experiment.py` 检查点 | PASS | 1 passed（该文件只被 11-07 的 8b0a748 改过） |
-| R-09 | `tests/test_runtime_ui.py` 界面测试 | PASS | 9 passed；连同非界面测试全量为 62 passed |
+| R-08 | `tests/run_experiment.py` 检查点 | PASS | 1 passed（该文件只被 11-07 的 `8b0a748` 改过） |
+| R-09 | `tests/test_runtime_ui.py` 界面测试 | PASS | 按 streamlit 1.39.0 直接运行 9 passed；与非界面测试合计 62 passed |
 
 ## 关键数值（与 11-09 交付逐位一致）
 
@@ -64,7 +68,7 @@ sha256sum handoff/xrs/20261112_retest/final_logs/run_log_final_120.jsonl   # 期
 
 ## 复现命令
 
-在基准提交的工作目录内执行：
+在基准提交 `bc786f3` 的工作目录内执行（依赖按 `requirements.txt` 安装）：
 
 ```bash
 # R-01 逐轮校验重跑（或直接运行 rebuild_retest_outputs.py，会同时导出差异表）
@@ -102,7 +106,8 @@ PY
 python3 -m pytest -q --ignore=tests/test_runtime_ui.py
 python3 -m pytest -q handoff/xrs/20261111_acceptance/test_end_to_end_tool_deny.py -v
 python3 -m pytest -q tests/test_runner_checkpoint.py -v
-ln -sf ../app.py tests/app.py && python3 -m pytest -q tests/test_runtime_ui.py -v; rm -f tests/app.py
+python3 -m pytest -q tests/test_runtime_ui.py -v
+python3 -m pytest -q   # 全量 62 项
 
 # R-07 冻结复核
 python3 handoff/cxy/20261106_freeze/verify_freeze.py
@@ -118,7 +123,8 @@ python3 handoff/cxy/20261106_freeze/verify_freeze.py
 | `calculation_check_retest.csv` | R-02 | 逐条计算核对表，md5 `cabc4d95…`（已入库） |
 | `negative_selftest_retest.txt` | R-03 | 七场景负向自测输出（已入库） |
 | `e2e_deny_test_retest.txt` | R-06 | 11 月 12 日重新执行的 5 项端到端结果（已入库） |
-| `runtime_ui_test_retest.txt` | R-09 | 11 月 12 日执行的 9 项界面测试结果（已入库） |
+| `runtime_ui_test_retest.txt` | R-09 | 11 月 12 日执行的 9 项界面测试结果，含环境与依赖记录（已入库） |
+| `full_test_retest.txt` | R-05 + R-09 | 全量测试 62 passed 的输出（已入库） |
 | `freeze_verify_retest.txt` | R-07 | 冻结复核输出（2 项 mismatch，已入库） |
 | `final_logs/log_manifest.csv`、`final_logs/log_chain_verify.txt` | R-04 | 日志清单与链校验（已入库） |
 
@@ -138,6 +144,6 @@ python3 handoff/xrs/20261112_retest/_build/rebuild_retest_outputs.py
 
 - 本机无 ollama 与 `localhost:11434` 服务，无法重跑 120 次模型实验；本次复测全部基于 11 月 8 日已入库的原始日志，属于任务要求的「不重跑模型、只重跑受修复影响的测试」。
 - 120 次的运行提交号、RC1／RC2 与模型 digest 仍标「待补」，CXY 已确认该缺失不否定 11-08 交付、不要求重跑。
-- 界面测试 `tests/test_runtime_ui.py` 在仓库现状态下无法直接运行：测试内用 `AppTest.from_file("app.py")`，相对路径会解析到 `tests/app.py`。本次在隔离副本中建立临时符号链接 `tests/app.py -> ../app.py` 后运行，链接用完即删、未入库；本次安装 streamlit 1.67.0 用于验证。测试文件的路径写法缺陷已记录，本次不改代码。
+- 界面测试此前曾录得「需临时符号链接 `tests/app.py → ../app.py`」，已查明是当时本机装有 streamlit 1.67.0、新版 AppTest 对 `from_file("app.py")` 的相对路径解析与 1.39.0 不同造成的，**不是仓库缺陷**。按要求换回 `requirements.txt` 固定的 streamlit 1.39.0 后，不做任何链接直接运行即 9 passed，结论已更正为 R-09 现记录；CXY 在 1.39.0 下独立复核也是 9 项全过。
 - `validation_summary_retest.txt` 中「输出」一行保留了执行机的绝对路径（脚本原样输出，未后处理）；其他证据文件均使用仓内相对路径。
 - `security_retest.csv` 中的 `rerun_command` 为相对路径写法，需在仓库根目录执行。
