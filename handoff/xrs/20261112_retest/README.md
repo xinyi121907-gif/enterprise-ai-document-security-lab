@@ -67,7 +67,7 @@ sha256sum handoff/xrs/20261112_retest/final_logs/run_log_final_120.jsonl   # 期
 在基准提交的工作目录内执行：
 
 ```bash
-# R-01 逐轮校验重跑
+# R-01 逐轮校验重跑（或直接运行 rebuild_retest_outputs.py，会同时导出差异表）
 python3 tests/validate_rounds.py \
   --input handoff/zl/2026_11_8/raw_runs_all.csv \
   --log handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl \
@@ -108,19 +108,31 @@ ln -sf ../app.py tests/app.py && python3 -m pytest -q tests/test_runtime_ui.py -
 python3 handoff/cxy/20261106_freeze/verify_freeze.py
 ```
 
-## 本次复测的实体输出（全部入库）
+## 本次复测的实体输出
 
 | 文件 | 对应 | 说明 |
 |---|---|---|
-| `security_validation_rounds_retest.csv` | R-01 | 120 行重跑明细（23 182 B） |
-| `validation_summary_retest.txt` | R-01 | 重跑汇总与运行错误清单 |
-| `metrics_retest.csv` | R-02 | 指标复算表，md5 `60988b6e…` |
-| `calculation_check_retest.csv` | R-02 | 逐条计算核对表，md5 `cabc4d95…` |
-| `negative_selftest_retest.txt` | R-03 | 七场景负向自测输出 |
-| `e2e_deny_test_retest.txt` | R-06 | 11 月 12 日重新执行的 5 项端到端结果 |
-| `runtime_ui_test_retest.txt` | R-09 | 11 月 12 日执行的 9 项界面测试结果 |
-| `freeze_verify_retest.txt` | R-07 | 冻结复核输出（2 项 mismatch） |
-| `final_logs/log_manifest.csv`、`final_logs/log_chain_verify.txt` | R-04 | 日志清单与链校验 |
+| `security_validation_rounds_retest.csv` | R-01 | 120 行明细，md5 `5d90a4e4…`；**未重复入库**，用下面一条命令可重建 |
+| `validation_summary_retest.txt` | R-01 | 重跑汇总与运行错误清单（已入库） |
+| `metrics_retest.csv` | R-02 | 指标复算表，md5 `60988b6e…`（已入库） |
+| `calculation_check_retest.csv` | R-02 | 逐条计算核对表，md5 `cabc4d95…`（已入库） |
+| `negative_selftest_retest.txt` | R-03 | 七场景负向自测输出（已入库） |
+| `e2e_deny_test_retest.txt` | R-06 | 11 月 12 日重新执行的 5 项端到端结果（已入库） |
+| `runtime_ui_test_retest.txt` | R-09 | 11 月 12 日执行的 9 项界面测试结果（已入库） |
+| `freeze_verify_retest.txt` | R-07 | 冻结复核输出（2 项 mismatch，已入库） |
+| `final_logs/log_manifest.csv`、`final_logs/log_chain_verify.txt` | R-04 | 日志清单与链校验（已入库） |
+
+### 逐轮明细表的重建方式
+
+`security_validation_rounds_retest.csv` 与已入库的 `handoff/xrs/20261108_rounds123/security_validation_rounds.csv` 除 `data_source` 标注列外逐字段完全一致：差异条目正好 120 条，全部集中在这一列。同一份 23 182 B 的表再存一份会产生「哪份是最终」的歧义，因此用一条可执行命令把它固定，而不是重复入库：
+
+```bash
+python3 handoff/xrs/20261112_retest/_build/rebuild_retest_outputs.py
+# 120 行明细，md5 5d90a4e4054ac0297450673f73feb273
+# 同时导出 security_validation_rounds_retest_diff.csv：120 条差异，全部为 data_source 列
+```
+
+该命令 2026-11-12 已实际运行验证：明细 120 行、md5 与复测时一致、非标注列差异 0。脚本同时把与 11-08 交付的差异逐条导出，供逐行核对。
 
 ## 已知问题
 

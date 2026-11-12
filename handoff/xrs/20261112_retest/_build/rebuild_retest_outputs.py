@@ -7,9 +7,10 @@
 
 产物（写入 handoff/xrs/20261112_retest/）：
     security_validation_rounds_retest.csv       120 行复测明细，md5 5d90a4e4054ac0297450673f73feb273
-    security_validation_rounds_retest_diff.csv  与 11-08 交付逐字段差异（120 行，仅 data_source 列）
+    security_validation_rounds_retest_diff.csv  与 11-08 交付逐字段差异（120 条，均为 data_source 列）
 
 不重跑模型：数据来自 handoff/zl/2026_11_8/ 已入库的正式 CSV 与 JSONL。
+2026-11-12 已实际运行验证：明细 120 行、md5 与复测时一致、非标注列差异 0。
 """
 import csv
 import hashlib
@@ -17,7 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 OUT = ROOT / 'handoff/xrs/20261112_retest'
 BASE = ROOT / 'handoff/xrs/20261108_rounds123/security_validation_rounds.csv'
 CSV = ROOT / 'handoff/zl/2026_11_8/raw_runs_all.csv'
@@ -37,24 +38,18 @@ old = list(csv.DictReader(open(BASE, encoding='utf-8')))
 if len(new) != len(old):
     raise SystemExit('行数不一致：%d vs %d' % (len(new), len(old)))
 
-cols = [c for c in new[0] if c != 'data_source']
 diffs = []
 for i, (a, b) in enumerate(zip(new, old), 1):
-    for c in cols:
-        if a[c] != b[c]:
-            diffs.append([i, a.get('system_version'), a.get('case_id'), a.get('run_no'), c, b[c], a[c]])
+    for c in a:
+        if a.get(c) != b.get(c):
+            diffs.append([i, a.get('system_version'), a.get('case_id'), a.get('run_no'), c, b.get(c), a.get(c)])
 
 with open(OUT / 'security_validation_rounds_retest_diff.csv', 'w', encoding='utf-8', newline='') as f:
     w = csv.writer(f, lineterminator='\n')
     w.writerow(['row_no', 'system_version', 'case_id', 'run_no', 'field', 'baseline_value', 'retest_value'])
-    for i, (a, b) in enumerate(zip(new, old), 1):
-        if a.get('data_source') != b.get('data_source'):
-            diffs.append([i, a.get('system_version'), a.get('case_id'), a.get('run_no'),
-                          'data_source', b.get('data_source'), a.get('data_source')])
     w.writerows(diffs)
 
 print('明细行数：%d' % len(new))
-print('非标注列字段差异：%d' % sum(1 for d in diffs if d[4] != 'data_source'))
-print('data_source 标注差异：%d' % sum(1 for d in diffs if d[4] == 'data_source'))
+print('差异条目：%d（全部为 data_source：%s）' % (len(diffs), all(d[4] == 'data_source' for d in diffs)))
 print('md5：%s' % hashlib.md5(RETEST.read_bytes()).hexdigest())
 print('期望 md5：5d90a4e4054ac0297450673f73feb273')
