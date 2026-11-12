@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.11, pytest-8.4.2, pluggy-1.6.0
+rootdir: /home/user/Doubao/chats/38449132019409154/xrs_1112/work
+plugins: Faker-40.44.0, anyio-4.15.1, libtmux-0.62.0
+collected 9 items
+
+tests/test_runtime_ui.py .........                                       [100%]
+
+============================== 9 passed in 11.37s ==============================
