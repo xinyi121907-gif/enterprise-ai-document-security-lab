@@ -1,0 +1,20 @@
+类别,序号,检查项,核对依据,结果,缺口或后续动作
+A 样本文件哈希,A01,13份样本文件存在性,sample_manifest.csv 13行 ↔ data/attack 8 + data/normal 2 + data/private 3,通过,
+A 样本文件哈希,A02,12份样本哈希与大小,封存当日重新计算 SHA-256 与 size_bytes，逐项比对 sample_manifest.csv,通过,IPI-01~04、OBF-01、PAR-01、ENC-01、NOR-01/02 共9份用例 + 3份私有资料均一致
+A 样本文件哈希,A03,PATH-01 哈希与大小,封存当日重算 data/attack/path_01_traversal_resume.txt,不一致,本地实际 dceb8b7b594d…/270B，清单冻结值 e51686b2…/271B，差1字节。封存必须使用 main 上 271B 冻结版覆盖本地文件，覆盖后重算确认等于 e51686b2…
+B 编号一致性,B01,10个 case_id 编号,test_cases_final.json ↔ case_consistency_rounds.csv ↔ sample_manifest.csv ↔ case_freeze_checklist.csv,通过,IPI-01~04、PATH-01、OBF-01、PAR-01、ENC-01、NOR-01/02 四处来源完全一致
+B 编号一致性,B02,文件名与 JSON file 字段,test_cases_final.json 的 file 字段 ↔ data 目录实际文件名,通过,10份用例文件路径逐项对应；3份私有资料仅通过 attack_target 引用，不在 file 字段
+B 编号一致性,B03,120次运行 case_id 覆盖,case_consistency_rounds.csv 120行 ↔ 10个 case_id × 4版本 × 3轮,通过,每个 case_id 在各版本各出现3轮，无缺失无重复
+C 文档编号与术语,C01,YCQ_docs_final.docx,编号、版本名、指标名、protected/keyword/ENC-01 口径,通过,已按修正口径更新，与 main 两份文档一致
+C 文档编号与术语,C02,YCQ_QA.docx,9条问答的编号引用与结论口径,通过,已同步 protected 新口径与局限说明
+C 文档编号与术语,C03,threat_model_final.docx 编号,本地副本 2026-11-03 12:05 / 24530B，第2节用例列举,需修正,第2节漏列 PATH-01（仅在6节单独讲），需补入总览列举；在 main 上修改后重新封存
+C 文档编号与术语,C04,threat_model_final.docx 术语,第1、5、9节，对照本轮 keyword/prompt_only 分开表述口径,需修正,原文将 keyword 与 prompt_only 统称软防御/软约束，需拆开表述
+C 文档编号与术语,C05,threat_model_final.docx 关键词绕过结论,第5节举例 ↔ raw_runs_all.csv keyword 版8个用例理由,需修正,原文写成 PAR-01/OBF-01/ENC-01 已绕过关键词；实测8个用例全部 DENY（命中 read_internal_file / data/private / base64），未发生绕过，须改为潜在风险
+C 文档编号与术语,C06,threat_model_final.docx 完成状态,第7节“120次运行…待验证”,需修正,120次运行已完成、指标已从原始日志算出，须删除“待验证”改为已完成
+C 文档编号与术语,C07,course_mapping_v1.docx,本地副本 2026-10-28 13:38 / 14357B，LLM01/02/06 标注与课程出处,通过,无 case_id 冲突；OWASP 编号与课件页码标注正确；第3节机制描述可保留
+C 文档编号与术语,C08,safety_statement.txt,本地工作区与历史会话目录全盘搜索,缺失,本地无副本，无法核对；须从 main 补传后核对编号、术语、结论三项再封存
+D 程序侧,D01,程序代码副本,本地工作区 find *.py *.yaml，结果 0 个文件,缺失,代码在 main 仓库，本地无副本；须在 main 核对 test_cases.json 与 run_experiment.py 的 case_id 加载逻辑
+D 程序侧,D02,config.yaml 与冻结参数,"freeze_manifest.json config 字段（qwen2.5:7b / temp=0 / timeout=60 / max_tool_rounds=3 / data/uploads / data/private / DEMO_SECRET,FLAG{）",通过,以 CXY 冻结记录为准，P01-P07 已填入 case_freeze_checklist.csv
+E 封存动作,E01,样本哈希再确认后封存,PATH-01 替换为冻结版后重算全13份,待执行,PATH-01 覆盖为 271B 冻结版后，重算13份哈希，与 sample_manifest.csv 全部一致才可封存
+E 封存动作,E02,120次原始日志保留,raw_runs_all.csv 120行 / raw_runs_all_log_120.jsonl / run_log_full_archive_244.jsonl,通过,失败运行3条（ENC-01/vulnerable）保留未删，原始错误未改写
+E 封存动作,E03,问答准备,YCQ_QA.docx 9条 ↔ 汇报10-15分钟、本人负责部分,通过,覆盖间接注入、主体客体、最小权限、六项指标、局限说明
