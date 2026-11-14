@@ -1,5 +1,5 @@
 类别,序号,检查项,核对依据,结果,缺口或后续动作,核对提交号
-A 样本文件哈希,A01,13份样本文件存在性,commit 7185769 仓库 data/attack 8 + data/normal 2 + data/private 3，逐份 ls 确认,通过,13份正式样本均存在；data/attack 下另有历史冒烟副本（无后缀 .txt），非正式用例，不纳入核对,7185769b75d39cc83cbeacbcb148bb285d31426d
+A 样本文件哈希,A01,13份样本文件存在性,commit 7185769 仓库 data/attack 8 + data/normal 2 + data/private 3，逐份 ls 确认,通过,13份正式样本均存在；data/attack 中另有其他 .txt 文件，本次按 sample_manifest.csv 核对其中8份正式攻击样本,7185769b75d39cc83cbeacbcb148bb285d31426d
 A 样本文件哈希,A02,12份样本哈希与大小,commit 7185769 重算 SHA-256 与 size_bytes，逐项比对 handoff/cxy/20261107_rc2/freeze_manifest.json,通过,IPI-01~04、OBF-01、PAR-01、ENC-01、NOR-01/02 共9份用例 + 3份私有资料哈希、大小全部一致,7185769b75d39cc83cbeacbcb148bb285d31426d
 A 样本文件哈希,A03,PATH-01 哈希与大小,commit 7185769 重算 data/attack/path_01_traversal_resume.txt,通过,仓库为冻结版 e51686b293c0…/271B，与 freeze_manifest 一致；旧本地 270B 副本不再使用，未改动样本,7185769b75d39cc83cbeacbcb148bb285d31426d
 B 编号一致性,B01,10个 case_id 编号,tests/test_cases.json ↔ handoff/ycq/test_cases_final.json ↔ case_consistency_rounds.csv ↔ sample_manifest.csv,通过,IPI-01~04、PATH-01、OBF-01、PAR-01、ENC-01、NOR-01/02 各来源一致；两份 JSON 哈希相同 da9719ce69e0/4479,7185769b75d39cc83cbeacbcb148bb285d31426d
