@@ -1,5 +1,14 @@
 # Enterprise AI Document Security Lab
 
+## 最终交付
+
+[正式包、备用包及 SHA256](https://github.com/xinyi121907-gif/enterprise-ai-document-security-lab/releases/tag/FINAL_2026-11-13) 对应提交 `e4c418e`。[ZL 主备包验收表](handoff/zl/2026_11_14/ZL_final_acceptance.csv) 记录了封包后的独立验收结果。[四段演示视频](https://github.com/xinyi121907-gif/enterprise-ai-document-security-lab/releases/tag/demo-videos-20261110) 单独存放。
+
+正式实验数据见 [120 次原始记录](handoff/zl/2026_11_8/raw_runs_all.csv)、[对应日志](handoff/zl/2026_11_8/raw_runs_all_log_120.jsonl)及[最终指标](handoff/xrs/20261109_metrics/metrics_final.csv)。原始运行提交号、RC 对应关系与运行时模型 digest 尚缺同期证据。
+
+11 月 10 日历史候选快照按当日 main 提交 `b362688` 于 11 月 15 日补建，见 [历史候选附件](https://github.com/xinyi121907-gif/enterprise-ai-document-security-lab/releases/tag/archive-20261110-rebuilt)。原始当日 ZIP 的字节与哈希未获确认。
+
+
 企业智能文档助手的间接提示词注入与越权数据泄露防护实验。
 
 > 安全边界：本仓库只使用虚构数据，只允许在本地授权环境中演示。禁止读取真实个人、学校或企业资料，禁止连接或攻击第三方系统。
