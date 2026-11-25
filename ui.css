@@ -25,4 +25,12 @@ hr {margin:1rem 0 1.3rem;border-color:#e0e6ee;}
 .paper-symbol {font-size:45px;color:#a3b5cc;margin-bottom:17px;}
 [data-testid="stAlert"] {border-radius:9px;font-size:14px;}
 @media(max-width:800px) {.block-container {padding:1.4rem 1rem;} .empty-result {min-height:220px;padding-top:35px;} h1{font-size:1.5rem!important;}}
+[data-testid="stToolbar"], [data-testid="stAppDeployButton"], #MainMenu {display:none!important;}
+[data-testid="stFileUploaderDropzone"] {flex-wrap:wrap;gap:8px;}
+[data-testid="stFileUploaderDropzoneInstructions"] > div > span {font-size:0;}
+[data-testid="stFileUploaderDropzoneInstructions"] > div > span::after {content:"将 TXT 文件拖到这里";font-size:14px;}
+[data-testid="stFileUploaderDropzoneInstructions"] small {font-size:0;}
+[data-testid="stFileUploaderDropzoneInstructions"] small::after {content:"UTF-8 编码 · 最大 2 MB";font-size:12px;}
+[data-testid="stFileUploaderDropzone"] button {font-size:0!important;min-width:90px;flex-shrink:0;white-space:nowrap;}
+[data-testid="stFileUploaderDropzone"] button::after {content:"选择文件";font-size:14px;}
 </style>

@@ -38,7 +38,7 @@ def model_status():
         with urlopen(host + "/api/tags", timeout=1.5) as response:
             models = json.load(response).get("models", [])
         ready = any(m.get("name") == DEFAULT_MODEL for m in models)
-        return ("模型已就绪" if ready else "模型未安装", datetime.now().strftime("%H:%M:%S"))
+        return ("本地模型已连接" if ready else "模型未安装", datetime.now().strftime("%H:%M:%S"))
     except Exception:
         return ("连接检测失败", datetime.now().strftime("%H:%M:%S"))
 
@@ -82,7 +82,7 @@ with st.sidebar:
             st.markdown(f"**{label}** · `{version}`")
             st.caption(DESCRIPTIONS[version])
     st.divider()
-    st.caption("本地授权教学实验\n\n文档与秘密标记均为虚构测试数据。")
+    st.caption("教学实验 · 全部使用虚构数据")
 
 heading, connection = st.columns([3, 1])
 with heading:
@@ -91,13 +91,12 @@ with heading:
 with connection:
     status, checked = model_status()
     st.markdown(f"**{status}**")
-    st.caption(f"{DEFAULT_MODEL} · 检测于 {checked}")
+    st.caption(DEFAULT_MODEL)
 st.divider()
 workspace, output = st.columns([1, 1.3], gap="large")
 with workspace:
     with st.container(border=True):
         st.subheader("文档工作区")
-        st.caption("上传文档，指定任务，查看本次审阅结果。")
         uploaded = st.file_uploader("上传 TXT 文档", type=["txt"], disabled=pending,
                                     help="UTF-8 编码，最大 2 MB。")
         file_bytes = uploaded.getvalue() if uploaded is not None else None
@@ -125,7 +124,6 @@ with workspace:
         fingerprint = (hashlib.sha256(file_bytes or b"").hexdigest(), system_version, business_type, query)
         st.button("审阅中…" if pending else "开始审阅", type="primary", use_container_width=True,
                   disabled=pending, on_click=submit_review)
-        st.caption("实验结果基于当前上传文档与所选版本。")
 
 if pending:
     st.session_state.review_exception = None
