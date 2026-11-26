@@ -38,3 +38,14 @@ def test_invalid_run_matrix_preserves_existing_results(tmp_path, monkeypatch, ro
     monkeypatch.setattr(runner, "parse_args", lambda: argparse.Namespace(cases=source, limit=limit, versions=versions, rounds=rounds, no_upload=True, mock=True, output=output))
     assert runner.main() == 2
     assert output.read_text() == "existing evidence"
+
+
+@pytest.mark.parametrize("contents", ["[]", "{}", "[1]", '[{"case_id":"X","category":"normal","business_type":"resume_review","file":"x","user_query":"q"}]'])
+def test_malformed_cases_rejected_before_output(tmp_path, monkeypatch, contents):
+    source = tmp_path / "cases.json"
+    source.write_text(contents)
+    output = tmp_path / "raw.csv"
+    output.write_text("existing evidence")
+    monkeypatch.setattr(runner, "parse_args", lambda: argparse.Namespace(cases=source, limit=0, versions="protected", rounds=1, no_upload=True, mock=True, output=output))
+    assert runner.main() == 2
+    assert output.read_text() == "existing evidence"

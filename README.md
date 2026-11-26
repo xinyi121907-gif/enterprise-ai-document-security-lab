@@ -1,5 +1,20 @@
 # Enterprise AI Document Security Lab
 
+## 当前演示与复现实验
+
+当前代码包括新版文档工作区。Windows 双击 `start.bat` 启动，默认最小权限防护；四版本保留相同的模型参数和业务接口。下面的历史正式包与旧视频保留原样，不能当作新版界面的运行证据。
+
+新实验推荐使用独立证据入口，避免混入界面日志或覆盖旧数据：
+
+```powershell
+python run_evidence.py --output-dir artifacts/experiments/demo-check --rounds 1 --limit 2 --mock
+python run_evidence.py --output-dir artifacts/experiments/model-validation --rounds 3
+```
+
+每次使用一个不存在的新目录。输出包含 `raw_runs.csv`、`run_log.jsonl` 和 `run_manifest.json`，记录运行时提交号、未提交修改、模型 digest、配置、代码与样本 SHA256，以及覆盖数量、日志链校验和错误数。mock 明确标注为流程验证，不能作为模型实验结论。中断会保留已完成行及状态；运行时修改源文件会标为 SOURCE_CHANGED。模型 digest 证明运行前查询到的本地模型身份，不能单独证明整个运行期间模型未被替换。
+
+正式复现前应使用老师要求的虚拟机或沙箱，记录实际隔离环境。Python 虚拟环境和项目文件夹不等于安全沙箱。本次维护不补写原 120 次运行缺失的历史证据。详细范围见 [代码维护说明](docs/code_stabilization_20261126.md)。
+
 ## 最终交付
 
 [正式包、备用包及 SHA256](https://github.com/xinyi121907-gif/enterprise-ai-document-security-lab/releases/tag/FINAL_2026-11-13) 对应提交 `e4c418e`。[ZL 主备包验收表](handoff/zl/2026_11_14/ZL_final_acceptance.csv) 记录了封包后的独立验收结果。[四段演示视频](https://github.com/xinyi121907-gif/enterprise-ai-document-security-lab/releases/tag/demo-videos-20261110) 单独存放。
