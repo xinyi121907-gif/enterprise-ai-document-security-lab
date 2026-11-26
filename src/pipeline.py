@@ -307,12 +307,12 @@ def _run_document_review(
 
         raise ValueError(f"未知的系统版本：{system_version}")
 
-    except FileNotFoundError:
-        error = f"文件不存在：{document_path}"
+    except FileNotFoundError as exc:
+        error = f"文件不存在：{exc.filename or document_path}"
     except UnicodeDecodeError:
-        error = f"文件不是 UTF-8 编码的文本：{document_path}"
-    except PermissionError:
-        error = f"没有权限读取文件：{document_path}"
+        error = "读取的文件不是 UTF-8 编码的文本，请结合工具轨迹核对目标文件。"
+    except PermissionError as exc:
+        error = f"没有权限读取文件：{exc.filename or document_path}"
     except OSError as exc:
         error = f"文件访问失败：{exc}"
     except Exception as exc:

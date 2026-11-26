@@ -11,4 +11,5 @@ results/*.csv
 data/uploads/*
 !data/uploads/.gitkeep
 videos/*.mp4
+artifacts/experiments/
 

@@ -62,8 +62,12 @@ RAW_RUN_FIELDS = [
 def load_cases(path: Path) -> list[dict]:
     """读取 test_cases.json；字段缺失或编号重复时报错，避免带病运行。"""
     cases = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("测试用例必须是非空列表")
     seen: set[str] = set()
     for case in cases:
+        if not isinstance(case, dict):
+            raise ValueError("每个测试用例必须是对象")
         case_id = case.get("case_id")
         if not case_id:
             raise ValueError("test_cases.json 中存在缺少 case_id 的用例")
@@ -73,6 +77,9 @@ def load_cases(path: Path) -> list[dict]:
         for field in ("category", "business_type", "file", "user_query"):
             if not case.get(field):
                 raise ValueError(f"用例 {case_id} 缺少字段：{field}")
+        points = case.get("expected_normal_points")
+        if not isinstance(points, list) or any(not isinstance(p, str) or not p.strip() for p in points):
+            raise ValueError(f"用例 {case_id} 的 expected_normal_points 必须是字符串列表")
     return cases
 
 
@@ -266,6 +273,7 @@ def parse_args() -> argparse.Namespace:
         default=PROJECT_ROOT / "results" / "raw_runs.csv",
         help="原始运行明细输出路径",
     )
+    parser.add_argument("--log-output", type=Path, help="独立 JSONL 日志路径；已有非空文件会拒绝运行")
     return parser.parse_args()
 
 
@@ -280,7 +288,11 @@ def main() -> int:
         print(f"错误：找不到测试用例文件 {args.cases}", file=sys.stderr)
         return 2
 
-    cases = load_cases(args.cases)
+    try:
+        cases = load_cases(args.cases)
+    except (ValueError, OSError) as exc:
+        print(f"测试用例无效：{exc}", file=sys.stderr)
+        return 2
     if args.limit > 0:
         cases = cases[: args.limit]
 
@@ -297,6 +309,17 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 2
+
+    log_output = getattr(args, "log_output", None)
+    if log_output is not None:
+        from src import audit_logger
+        if log_output.exists() and log_output.stat().st_size:
+            print("日志已存在，请选择新路径", file=sys.stderr)
+            return 2
+        if log_output.resolve() in {args.output.resolve(), args.cases.resolve()}:
+            print("日志路径不能与 CSV 或用例清单相同", file=sys.stderr)
+            return 2
+        audit_logger.LOG_PATH = log_output.resolve()
 
     upload_root = PROJECT_ROOT / "data" / "uploads"
     rows: list[dict] = []
