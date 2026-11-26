@@ -28,3 +28,13 @@ def test_completed_rows_survive_interruption(tmp_path, monkeypatch):
         rows = list(csv.DictReader(f))
     assert len(rows) == 1 and rows[0]["case_id"] == "NOR-01"
     assert not output.with_name(output.name + ".tmp").exists()
+
+@pytest.mark.parametrize("rounds,limit,versions", [(0,0,"protected"),(-1,0,"protected"),(1,-1,"protected"),(1,0,""),(1,0,"protected,protected")])
+def test_invalid_run_matrix_preserves_existing_results(tmp_path, monkeypatch, rounds, limit, versions):
+    source = tmp_path / "cases.json"
+    source.write_text("[]")
+    output = tmp_path / "raw.csv"
+    output.write_text("existing evidence")
+    monkeypatch.setattr(runner, "parse_args", lambda: argparse.Namespace(cases=source, limit=limit, versions=versions, rounds=rounds, no_upload=True, mock=True, output=output))
+    assert runner.main() == 2
+    assert output.read_text() == "existing evidence"

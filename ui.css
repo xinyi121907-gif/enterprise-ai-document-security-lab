@@ -1,0 +1,36 @@
+<style>
+:root {color-scheme:light;}
+.stApp {background:#f3f5f8;color:#19283d;font-family:Inter,"Microsoft YaHei",sans-serif;}
+header[data-testid="stHeader"] {background:transparent;}
+[data-testid="stMainBlockContainer"], .block-container {padding:2.2rem 2.8rem 3rem;max-width:1440px;}
+[data-testid="stSidebar"] {background:#fff;border-right:1px solid #e3e8ef;}
+[data-testid="stSidebarUserContent"] {padding-top:2rem;}
+.brand-mark {font-size:26px;font-weight:800;letter-spacing:.08em;color:#183c67;}
+.brand-mark span {color:#a7b5c6;font-weight:400;}
+h1 {font-size:1.9rem!important;font-weight:700!important;letter-spacing:-.03em;padding-bottom:.4rem!important;color:#152d4b;}
+h3 {font-size:1.12rem!important;color:#213752;}
+[data-testid="stVerticalBlockBorderWrapper"]>div {background:#fff;border-radius:14px;}
+[data-testid="stVerticalBlockBorderWrapper"] {border-color:#e2e7ee!important;border-radius:14px!important;}
+[data-testid="stFileUploaderDropzone"] {background:#f7f9fc;border:1px dashed #afbed0;border-radius:10px;}
+[data-testid="stFileUploaderDropzone"] button {font-size:.85rem;}
+.stTextArea textarea {background:#f9fafc;color:#243650;border-color:#dde4ed;border-radius:9px;}
+.stButton button[kind="primary"] {background:#173f70;color:white;border:0;border-radius:9px;min-height:44px;font-weight:600;}
+.stButton button[kind="primary"]:hover {background:#23588e;}
+.stButton button:disabled {opacity:.6;}
+.stCaption, [data-testid="stCaptionContainer"] {color:#6a7a8f;}
+hr {margin:1rem 0 1.3rem;border-color:#e0e6ee;}
+.empty-result {text-align:center;min-height:360px;padding:78px 16px 40px;color:#7b8ba0;}
+.empty-result h3 {font-weight:500!important;color:#465c76;}
+.empty-result p {font-size:14px;line-height:1.9;}
+.paper-symbol {font-size:45px;color:#a3b5cc;margin-bottom:17px;}
+[data-testid="stAlert"] {border-radius:9px;font-size:14px;}
+@media(max-width:800px) {.block-container {padding:1.4rem 1rem;} .empty-result {min-height:220px;padding-top:35px;} h1{font-size:1.5rem!important;}}
+[data-testid="stToolbar"], [data-testid="stAppDeployButton"], #MainMenu {display:none!important;}
+[data-testid="stFileUploaderDropzone"] {flex-wrap:wrap;gap:8px;}
+[data-testid="stFileUploaderDropzoneInstructions"] > div > span {font-size:0;}
+[data-testid="stFileUploaderDropzoneInstructions"] > div > span::after {content:"将 TXT 文件拖到这里";font-size:14px;}
+[data-testid="stFileUploaderDropzoneInstructions"] small {font-size:0;}
+[data-testid="stFileUploaderDropzoneInstructions"] small::after {content:"UTF-8 编码 · 最大 2 MB";font-size:12px;}
+[data-testid="stFileUploaderDropzone"] button {font-size:0!important;min-width:90px;flex-shrink:0;white-space:nowrap;}
+[data-testid="stFileUploaderDropzone"] button::after {content:"选择文件";font-size:14px;}
+</style>

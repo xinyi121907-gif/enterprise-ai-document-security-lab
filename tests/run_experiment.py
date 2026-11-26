@@ -272,6 +272,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
 
+    if args.rounds < 1 or args.limit < 0:
+        print("rounds must be positive and limit must be nonnegative", file=sys.stderr)
+        return 2
+
     if not args.cases.exists():
         print(f"错误：找不到测试用例文件 {args.cases}", file=sys.stderr)
         return 2
@@ -283,6 +287,9 @@ def main() -> int:
     versions = tuple(
         v.strip() for v in args.versions.split(",") if v.strip()
     )
+    if not versions or len(set(versions)) != len(versions):
+        print("versions must be nonempty and unique", file=sys.stderr)
+        return 2
     for v in versions:
         if v not in SYSTEM_VERSIONS:
             print(
